@@ -49,6 +49,7 @@
                 <div id="header-provider-container" class="flex items-center gap-2">
                     <select id="provider-select" onchange="updatePlayerUrl()" 
                         class="bg-zinc-900 border border-zinc-800 rounded px-2 py-1 text-xs text-zinc-300 focus:outline-none focus:border-zinc-500 cursor-pointer">
+                        <option value="vidking">Vidking</option>
                         <option value="vidlink">VidLink.pro</option>
                         <option value="vidkingnet">VidKing.net</option>
                         <option value="vidsrccc">VidSrc.cc</option>
@@ -56,7 +57,6 @@
                         <option value="vidsrcme">VidSrc.me</option>
                         <option value="autoembed">AutoEmbed</option>
                         <option value="twoembed">2Embed</option>
-                        <option value="vidking">Vidking</option>
                         <option value="smashy">Smashy Stream</option>
                         <option value="embedsu">Embed.su</option>
                         <option value="moviesapi">MoviesAPI</option>
@@ -170,6 +170,8 @@
 
         function getEmbedUrl(provider, type, id, s = 1, e = 1) {
             switch(provider) {
+                case 'vidking':   
+                    return `https://vidking.link/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`;
                 case 'vidlink':
                     return type === 'movie' ? `https://vidlink.pro/movie/${id}` : `https://vidlink.pro/tv/${id}/${s}/${e}`;
                 case 'vidkingnet':
@@ -196,7 +198,6 @@
                     return type === 'movie' ? `https://moviesapi.club/movie/${id}` : `https://moviesapi.club/tv/${id}-${s}-${e}`;
                 case 'superembed':
                     return type === 'movie' ? `https://multiembed.mov/?video_id=${id}&tmdb=1` : `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}`;
-                case 'vidking':   return `https://vidking.link/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`;
                 case 'novera':    return `https://player.novera.website/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`;
                 case 'cinepro':   return `https://cinepro.org/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`;
                 case 'movieweb':  return `https://backend.movie-web.app/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`;
@@ -217,7 +218,7 @@
                 case 'epicscreen': return `https://epicscreen.live/embed/${type}/${id}`;
                 case 'cineluxe':   return `https://cineluxe.club/embed/${type}/${id}`;
                 default:
-                    return type === 'movie' ? `https://vidlink.pro/movie/${id}` : `https://vidlink.pro/tv/${id}/${s}/${e}`;
+                    return `https://vidking.link/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`;
             }
         }
 
