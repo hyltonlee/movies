@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>hylton</title>
+    <title>hylton - Stream Movies & TV Shows</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -27,6 +27,28 @@
         ::-webkit-scrollbar-track { background: #09090b; }
         ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+        .card-description {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .modal-description {
+            display: -webkit-box;
+            -webkit-line-clamp: 6;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-fadeIn { animation: fadeIn 0.2s ease-out; }
+        .animate-slideUp { animation: slideUp 0.3s ease-out; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-zinc-800 selection:text-zinc-100">
@@ -126,26 +148,12 @@
                     </div>
                 </div>
 
-                <div id="media-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+                <div id="media-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
                 <div class="flex items-center justify-center gap-3 pt-6">
-                    <button
-                        id="prev-page-btn"
-                        onclick="changeTrendingPage(-1)"
-                        class="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-zinc-100 border border-zinc-800 rounded bg-zinc-900/40">
-                        Prev
-                    </button>
-
-                    <div id="page-indicator" class="text-xs text-zinc-500 font-mono">
-                        Page 1
-                    </div>
-
-                    <button
-                        id="next-page-btn"
-                        onclick="changeTrendingPage(1)"
-                        class="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-zinc-100 border border-zinc-800 rounded bg-zinc-900/40">
-                        Next
-                    </button>
+                    <button id="prev-page-btn" onclick="changeTrendingPage(-1)" class="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-zinc-100 border border-zinc-800 rounded bg-zinc-900/40">Prev</button>
+                    <div id="page-indicator" class="text-xs text-zinc-500 font-mono">Page 1</div>
+                    <button id="next-page-btn" onclick="changeTrendingPage(1)" class="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-zinc-100 border border-zinc-800 rounded bg-zinc-900/40">Next</button>
                 </div>
             </div>
         </section>
@@ -167,8 +175,7 @@
                     <h4 class="text-sm font-medium tracking-tight">Navigation Matrix</h4>
                     <div class="flex items-center gap-2">
                         <span class="text-xs text-zinc-400">Season:</span>
-                        <select id="season-select" onchange="onSeasonChange()" class="bg-zinc-900 border border-zinc-800 rounded px-2 py-0.5 text-xs text-zinc-300 focus:outline-none">
-                        </select>
+                        <select id="season-select" onchange="onSeasonChange()" class="bg-zinc-900 border border-zinc-800 rounded px-2 py-0.5 text-xs text-zinc-300 focus:outline-none"></select>
                     </div>
                 </div>
                 <div id="episode-grid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-2"></div>
@@ -176,26 +183,93 @@
         </section>
     </main>
 
+    <!-- Detailed Info Modal -->
+    <div id="detail-modal" class="fixed inset-0 z-[200] hidden items-center justify-center p-4 bg-black/90 backdrop-blur-md overflow-y-auto">
+        <div class="max-w-4xl w-full mx-auto animate-slideUp">
+            <div class="bg-gradient-to-b from-zinc-900 to-zinc-950 rounded-xl border border-zinc-800 overflow-hidden shadow-2xl">
+                <div id="modal-backdrop" class="relative h-64 md:h-96 bg-cover bg-center" style="background-image: url('');">
+                    <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent"></div>
+                    <button onclick="closeDetailModal()" class="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/70 rounded-full backdrop-blur-sm transition-colors z-10">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+                
+                <div class="relative px-6 pb-6 -mt-20">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="w-40 md:w-56 flex-shrink-0 mx-auto md:mx-0">
+                            <img id="modal-poster" src="" alt="" class="w-full rounded-lg shadow-2xl border-2 border-zinc-800">
+                        </div>
+                        
+                        <div class="flex-1 space-y-4">
+                            <div>
+                                <h2 id="modal-title" class="text-2xl md:text-3xl font-bold text-zinc-100 mb-2"></h2>
+                                <div class="flex flex-wrap items-center gap-3 text-sm">
+                                    <span id="modal-year" class="text-zinc-400"></span>
+                                    <span id="modal-runtime" class="text-zinc-400"></span>
+                                    <span id="modal-status" class="text-zinc-400"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center gap-4">
+                                <div class="flex items-center gap-2">
+                                    <div class="relative">
+                                        <svg class="w-12 h-12 transform -rotate-90">
+                                            <circle cx="24" cy="24" r="20" fill="none" stroke="#27272a" stroke-width="3"/>
+                                            <circle id="modal-rating-circle" cx="24" cy="24" r="20" fill="none" stroke="#fbbf24" stroke-width="3" stroke-dasharray="125.6" stroke-dashoffset="0" stroke-linecap="round"/>
+                                        </svg>
+                                        <span id="modal-rating-text" class="absolute inset-0 flex items-center justify-center text-sm font-bold text-zinc-100">0</span>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs text-zinc-400">User Score</div>
+                                        <div id="modal-stars" class="text-yellow-500 text-sm"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex flex-wrap gap-2" id="modal-genres"></div>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-sm font-semibold text-zinc-300 mb-2">Overview</h3>
+                                <p id="modal-overview" class="text-sm text-zinc-400 leading-relaxed"></p>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div id="modal-crew"></div>
+                                <div id="modal-cast"></div>
+                            </div>
+                            
+                            <div class="flex gap-3 pt-4">
+                                <button id="modal-watch-btn" class="flex-1 bg-zinc-100 text-zinc-950 px-4 py-2 rounded-lg font-semibold hover:bg-zinc-200 transition-colors flex items-center justify-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                                    Watch Now
+                                </button>
+                                <button onclick="closeDetailModal()" class="px-4 py-2 rounded-lg border border-zinc-700 text-zinc-400 hover:text-zinc-200 hover:border-zinc-600 transition-colors">
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="settings-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm">
-        <div class="bg-zinc-950 border border-zinc-800 rounded-lg max-w-md w-full shadow-2xl p-6 space-y-6 animate-in fade-in zoom-in-95 duration-150">
+        <div class="bg-zinc-950 border border-zinc-800 rounded-lg max-w-md w-full shadow-2xl p-6 space-y-6">
             <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
                 <div>
                     <h3 class="text-base font-semibold tracking-tight text-zinc-100">Settings</h3>
                     <p class="text-xs text-zinc-500 mt-0.5">Change your settings</p>
                 </div>
                 <button onclick="toggleSettingsModal()" class="text-zinc-500 hover:text-zinc-300 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
-
             <div class="space-y-4">
                 <div class="space-y-1.5">
                     <label for="settings-default-provider" class="text-xs font-medium text-zinc-400">Primary Source</label>
-                    <select id="settings-default-provider" class="w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-500 cursor-pointer">
-                    </select>
-                    <p class="text-[11px] text-zinc-500">Choose the source</p>
+                    <select id="settings-default-provider" class="w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-500 cursor-pointer"></select>
                 </div>
-
                 <div class="pt-2 border-t border-zinc-800 space-y-3">
                     <h4 class="text-xs font-medium text-zinc-400">Storage</h4>
                     <div class="flex items-center justify-between bg-zinc-900/40 p-3 border border-zinc-800/80 rounded-md">
@@ -203,13 +277,10 @@
                             <p class="text-xs font-medium text-zinc-300">Delete cache</p>
                             <p class="text-[10px] text-zinc-500 mt-0.5">Wipes your cache</p>
                         </div>
-                        <button onclick="clearDeviceHistory(); toggleSettingsModal();" class="text-xs font-medium text-red-400 hover:text-red-300 border border-red-950/50 hover:border-red-900 bg-red-950/20 px-2.5 py-1.5 rounded transition-colors">
-                            Clear Cache
-                        </button>
+                        <button onclick="clearDeviceHistory(); toggleSettingsModal();" class="text-xs font-medium text-red-400 hover:text-red-300 border border-red-950/50 hover:border-red-900 bg-red-950/20 px-2.5 py-1.5 rounded transition-colors">Clear Cache</button>
                     </div>
                 </div>
             </div>
-
             <div class="flex justify-end gap-2 pt-2">
                 <button onclick="toggleSettingsModal()" class="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-zinc-200 transition-colors border border-zinc-800 rounded bg-zinc-900">Cancel</button>
                 <button onclick="saveClientSettings()" class="px-3 py-1.5 text-xs font-medium bg-zinc-100 text-zinc-950 hover:bg-zinc-200 rounded transition-colors">Save Configurations</button>
@@ -218,13 +289,14 @@
     </div>
 
     <footer class="border-t border-zinc-800 bg-zinc-950/20 py-6 text-center text-xs text-zinc-600 mt-auto">
-        &copy; movies tv shows anime.
+        &copy; 2026 hylton.
     </footer>
 
     <script>
         const API_KEY = '3da63f2030991fb208636501d053bf0d';
         const BASE_URL = 'https://api.themoviedb.org/3';
-        const IMAGE_URL = 'https://image.tmdb.org/t/p/w342';
+        const IMAGE_URL = 'https://image.tmdb.org/t/p/w500';
+        const BACKDROP_URL = 'https://image.tmdb.org/t/p/original';
 
         let activeType = 'movie'; 
         let activeId = '';
@@ -233,130 +305,94 @@
         let activeEpisode = 1;
         let trendingPage = 1;
         let trendingTotalPages = 1;
-        let currentSearchQuery = ''; // Track if we're in search mode
+        let currentSearchQuery = '';
 
-        // Safe localStorage wrapper
-        function safeLocalStorage() {
-            try {
-                const test = '__storage_test__';
-                localStorage.setItem(test, test);
-                localStorage.removeItem(test);
-                return true;
-            } catch (e) {
-                console.warn('localStorage not available:', e.message);
-                return false;
+        const genreMap = {
+            movie: {
+                28: 'Action', 12: 'Adventure', 16: 'Animation', 35: 'Comedy', 80: 'Crime',
+                99: 'Documentary', 18: 'Drama', 10751: 'Family', 14: 'Fantasy', 36: 'History',
+                27: 'Horror', 10402: 'Music', 9648: 'Mystery', 10749: 'Romance', 878: 'Sci-Fi',
+                10770: 'TV Movie', 53: 'Thriller', 10752: 'War', 37: 'Western'
+            },
+            tv: {
+                10759: 'Action/Adventure', 16: 'Animation', 35: 'Comedy', 80: 'Crime',
+                99: 'Documentary', 18: 'Drama', 10751: 'Family', 10762: 'Kids', 9648: 'Mystery',
+                10763: 'News', 10764: 'Reality', 10765: 'Sci-Fi/Fantasy', 10766: 'Soap',
+                10767: 'Talk', 10768: 'War/Politics'
             }
-        }
+        };
 
+        function safeLocalStorage() {
+            try { localStorage.setItem('test', 'test'); localStorage.removeItem('test'); return true; } 
+            catch(e) { return false; }
+        }
         const storageAvailable = safeLocalStorage();
 
         function getItem(key, defaultValue = null) {
             if (!storageAvailable) return defaultValue;
-            try {
-                const value = localStorage.getItem(key);
-                return value !== null ? value : defaultValue;
-            } catch (e) {
-                console.warn('Failed to read from localStorage:', e.message);
-                return defaultValue;
-            }
+            try { return localStorage.getItem(key) || defaultValue; } catch(e) { return defaultValue; }
         }
-
         function setItem(key, value) {
             if (!storageAvailable) return false;
-            try {
-                localStorage.setItem(key, value);
-                return true;
-            } catch (e) {
-                console.warn('Failed to write to localStorage:', e.message);
-                return false;
-            }
+            try { localStorage.setItem(key, value); return true; } catch(e) { return false; }
         }
-
         function removeItem(key) {
             if (!storageAvailable) return false;
-            try {
-                localStorage.removeItem(key);
-                return true;
-            } catch (e) {
-                console.warn('Failed to remove from localStorage:', e.message);
-                return false;
-            }
+            try { localStorage.removeItem(key); return true; } catch(e) { return false; }
         }
 
         function getEmbedUrl(provider, type, id, s = 1, e = 1) {
-            switch(provider) {
-                case 'vidkingnet':
-                    return type === 'movie' ? `https://vidking.net/embed/movie/${id}` : `https://vidking.net/embed/tv/${id}/${s}/${e}`;
-                case 'vidlink':
-                    return type === 'movie' ? `https://vidlink.pro/movie/${id}` : `https://vidlink.pro/tv/${id}/${s}/${e}`;
-                case 'vidsrcto':
-                    return type === 'movie' ? `https://vidsrc.to/embed/movie/${id}` : `https://vidsrc.to/embed/tv/${id}/${s}/${e}`;
-                case 'vidsrccc':
-                    return type === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}`;
-                case 'vidsrcme':
-                    return type === 'movie' ? `https://vidsrc.me/embed/movie?tmdb=${id}` : `https://vidsrc.me/embed/tv?tmdb=${id}&sea=${s}&epi=${e}`;
-                case 'autoembed':
-                    return type === 'movie' ? `https://player.autoembed.to/movie/${id}` : `https://player.autoembed.to/tv/${id}/${s}/${e}`;
-                case 'twoembed':
-                    return type === 'movie' ? `https://www.2embed.cc/embed/${id}` : `https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}`;
-                case 'embedsu':
-                    return type === 'movie' ? `https://embed.su/embed/movie/${id}` : `https://embed.su/embed/tv/${id}/${s}/${e}`;
-                case 'vidsrcpro':
-                    return type === 'movie' ? `https://vidsrc.pro/embed/movie/${id}` : `https://vidsrc.pro/embed/tv/${id}/${s}/${e}`;
-                case 'rivestream':
-                    return type === 'movie' ? `https://api.rivestream.xyz/embed/movie?tmdb=${id}` : `https://api.rivestream.xyz/embed/tv?tmdb=${id}&season=${s}&episode=${e}`;
-                case 'smashy':
-                    return type === 'movie' ? `https://embed.smashystream.com/playere.php?tmdb=${id}` : `https://embed.smashystream.com/playere.php?tmdb=${id}&season=${s}&episode=${e}`;
-                case 'moviesapi':
-                    return type === 'movie' ? `https://moviesapi.club/movie/${id}` : `https://moviesapi.club/tv/${id}-${s}-${e}`;
-                case 'superembed':
-                    return type === 'movie' ? `https://multiembed.mov/?video_id=${id}&tmdb=1` : `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}`;
-                case 'novera':    return `https://player.novera.website/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`;
-                case 'cinepro':   return `https://cinepro.org/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`;
-                case 'movieweb':  return `https://backend.movie-web.app/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`;
-                case 'fsapi':     return `https://vidsrc.xyz/embed/movie/${id}`; 
-                case 'gomo':      return `https://gomoplayer.com/movie/${id}`;
-                case 'curtstream':return `https://curtstream.xyz/embed/${type}/${id}`;
-                case 'moviewp':   return `https://moviewp.xyz/embed/${type}/${id}`;
-                case 'apimdb':    return `https://api.imdbapi.xyz/embed/${type}/${id}`;
-                case 'vidcloud':  return `https://vidcloud.stream/embed/${type}/${id}`;
-                case 'streamnova':return `https://streamnova.xyz/embed/${type}/${id}`;
-                case 'cinematrixx':return `https://cinematrixx.lol/embed/${type}/${id}`;
-                case 'reelverse': return `https://reelverse.biz/embed/${type}/${id}`;
-                case 'flixora':   return `https://flixora.com/embed/${type}/${id}`;
-                case 'novaprime': return `https://novaprime.films/embed/${type}/${id}`;
-                case 'cinehorizon':return `https://cinehorizon.net/embed/${type}/${id}`;
-                case 'velostreams':return `https://velostreams.com/embed/${type}/${id}`;
-                case 'filmorahub': return `https://filmorahub.xyz/embed/${type}/${id}`;
-                case 'epicscreen': return `https://epicscreen.live/embed/${type}/${id}`;
-                case 'cineluxe':   return `https://cineluxe.club/embed/${type}/${id}`;
-                default:
-                    return `https://vidking.net/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`;
-            }
+            const providers = {
+                vidkingnet: type === 'movie' ? `https://vidking.net/embed/movie/${id}` : `https://vidking.net/embed/tv/${id}/${s}/${e}`,
+                vidlink: type === 'movie' ? `https://vidlink.pro/movie/${id}` : `https://vidlink.pro/tv/${id}/${s}/${e}`,
+                vidsrcto: type === 'movie' ? `https://vidsrc.to/embed/movie/${id}` : `https://vidsrc.to/embed/tv/${id}/${s}/${e}`,
+                vidsrccc: type === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}`,
+                vidsrcme: type === 'movie' ? `https://vidsrc.me/embed/movie?tmdb=${id}` : `https://vidsrc.me/embed/tv?tmdb=${id}&sea=${s}&epi=${e}`,
+                autoembed: type === 'movie' ? `https://player.autoembed.to/movie/${id}` : `https://player.autoembed.to/tv/${id}/${s}/${e}`,
+                twoembed: type === 'movie' ? `https://www.2embed.cc/embed/${id}` : `https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}`,
+                embedsu: type === 'movie' ? `https://embed.su/embed/movie/${id}` : `https://embed.su/embed/tv/${id}/${s}/${e}`,
+                vidsrcpro: type === 'movie' ? `https://vidsrc.pro/embed/movie/${id}` : `https://vidsrc.pro/embed/tv/${id}/${s}/${e}`,
+                rivestream: type === 'movie' ? `https://api.rivestream.xyz/embed/movie?tmdb=${id}` : `https://api.rivestream.xyz/embed/tv?tmdb=${id}&season=${s}&episode=${e}`,
+                smashy: type === 'movie' ? `https://embed.smashystream.com/playere.php?tmdb=${id}` : `https://embed.smashystream.com/playere.php?tmdb=${id}&season=${s}&episode=${e}`,
+                moviesapi: type === 'movie' ? `https://moviesapi.club/movie/${id}` : `https://moviesapi.club/tv/${id}-${s}-${e}`,
+                superembed: type === 'movie' ? `https://multiembed.mov/?video_id=${id}&tmdb=1` : `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}`,
+                novera: `https://player.novera.website/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`,
+                cinepro: `https://cinepro.org/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`,
+                movieweb: `https://backend.movie-web.app/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`,
+            };
+            return providers[provider] || providers.vidkingnet;
+        }
+
+        function getRatingColor(rating) {
+            if (rating >= 8) return 'text-emerald-400';
+            if (rating >= 7) return 'text-green-400';
+            if (rating >= 6) return 'text-yellow-400';
+            if (rating >= 5) return 'text-orange-400';
+            return 'text-red-400';
+        }
+
+        function renderStars(rating) {
+            const stars = (rating / 2).toFixed(1);
+            const fullStars = Math.floor(rating / 2);
+            const hasHalfStar = (rating / 2) % 1 >= 0.5;
+            let starStr = '';
+            for (let i = 0; i < fullStars; i++) starStr += '★';
+            if (hasHalfStar) starStr += '½';
+            for (let i = 0; i < 5 - Math.ceil(rating / 2); i++) starStr += '☆';
+            return starStr;
         }
 
         function setPageIndicator() {
             const pageIndicator = document.getElementById('page-indicator');
             const prevBtn = document.getElementById('prev-page-btn');
             const nextBtn = document.getElementById('next-page-btn');
-
             if (pageIndicator) pageIndicator.innerText = `Page ${trendingPage} of ${trendingTotalPages}`;
-            if (prevBtn) {
-                prevBtn.disabled = trendingPage <= 1;
-                prevBtn.classList.toggle('opacity-50', trendingPage <= 1);
-                prevBtn.classList.toggle('cursor-not-allowed', trendingPage <= 1);
-            }
-            if (nextBtn) {
-                nextBtn.disabled = trendingPage >= trendingTotalPages;
-                nextBtn.classList.toggle('opacity-50', trendingPage >= trendingTotalPages);
-                nextBtn.classList.toggle('cursor-not-allowed', trendingPage >= trendingTotalPages);
-            }
+            if (prevBtn) prevBtn.disabled = trendingPage <= 1;
+            if (nextBtn) nextBtn.disabled = trendingPage >= trendingTotalPages;
         }
 
         async function changeTrendingPage(delta) {
-            // Don't change page if we're in search mode
             if (currentSearchQuery) return;
-            
             const newPage = trendingPage + delta;
             if (newPage < 1 || newPage > trendingTotalPages) return;
             trendingPage = newPage;
@@ -372,24 +408,26 @@
             const handleSearch = async (e) => {
                 const query = e.target.value.trim();
                 currentSearchQuery = query;
-                
                 if (query.length > 2) {
                     try {
                         const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
                         const data = await res.json();
                         const filtered = data.results.filter(i => i.media_type === 'movie' || i.media_type === 'tv');
                         document.getElementById('section-title').innerText = `Search results for: "${query}"`;
-                        renderGrid(filtered, null);
-                        // Hide pagination when searching
+                        const detailedItems = await Promise.all(filtered.map(async (item) => {
+                            const type = item.media_type;
+                            const detailRes = await fetch(`${BASE_URL}/${type}/${item.id}?api_key=${API_KEY}`);
+                            const details = await detailRes.json();
+                            return { ...item, details };
+                        }));
+                        renderDetailedGrid(detailedItems);
                         document.getElementById('prev-page-btn').style.display = 'none';
                         document.getElementById('next-page-btn').style.display = 'none';
                         document.getElementById('page-indicator').style.display = 'none';
                     } catch (err) {
                         console.error('Search failed:', err);
-                        document.getElementById('media-grid').innerHTML = '<div class="col-span-full text-center text-zinc-500 py-12 text-sm">Search failed. Please try again.</div>';
                     }
                 } else if (query.length === 0) {
-                    // Show pagination again
                     document.getElementById('prev-page-btn').style.display = 'flex';
                     document.getElementById('next-page-btn').style.display = 'flex';
                     document.getElementById('page-indicator').style.display = 'flex';
@@ -398,19 +436,14 @@
                     setPageIndicator();
                 }
             };
-
-            const heroSearch = document.getElementById('hero-search-input');
-            const navSearch = document.getElementById('nav-search-input');
-            if (heroSearch) heroSearch.addEventListener('input', handleSearch);
-            if (navSearch) navSearch.addEventListener('input', handleSearch);
+            document.getElementById('hero-search-input').addEventListener('input', handleSearch);
+            document.getElementById('nav-search-input').addEventListener('input', handleSearch);
         });
 
         function initializePreferences() {
             const savedProvider = getItem('hylton_preferred_provider', 'vidkingnet');
-            
             const mainSelect = document.getElementById('provider-select');
             if (mainSelect) mainSelect.value = savedProvider;
-
             const modalSelect = document.getElementById('settings-default-provider');
             if (modalSelect && mainSelect) {
                 modalSelect.innerHTML = mainSelect.innerHTML;
@@ -439,10 +472,7 @@
                 setItem('hylton_preferred_provider', selected);
                 const mainSelect = document.getElementById('provider-select');
                 if (mainSelect) mainSelect.value = selected;
-                
-                if (!document.getElementById('player-view')?.classList.contains('hidden')) {
-                    updatePlayerUrl();
-                }
+                if (!document.getElementById('player-view')?.classList.contains('hidden')) updatePlayerUrl();
             }
             toggleSettingsModal();
         }
@@ -457,7 +487,6 @@
 
         async function fetchTrending(type, resetPage = false) {
             activeType = type;
-
             const movieBtn = document.getElementById('toggle-movie');
             const tvBtn = document.getElementById('toggle-tv');
             const sectionTitle = document.getElementById('section-title');
@@ -471,65 +500,75 @@
                 if (movieBtn) movieBtn.className = "px-3 py-1 rounded text-zinc-400 hover:text-zinc-100";
                 if (sectionTitle) sectionTitle.innerText = "Trending TV Series";
             }
-
-            // Reset to page 1 only when switching categories or explicitly requested
-            if (resetPage) {
-                trendingPage = 1;
-            }
+            if (resetPage) trendingPage = 1;
 
             try {
                 const res = await fetch(`${BASE_URL}/trending/${type}/week?api_key=${API_KEY}&page=${trendingPage}`);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
-
-                trendingTotalPages = Math.min(data.total_pages || 1, 500); // TMDB limits to 500 pages
+                trendingTotalPages = Math.min(data.total_pages || 1, 500);
                 setPageIndicator();
-                renderGrid(data.results, type);
+                const detailedItems = await Promise.all(data.results.map(async (item) => {
+                    const detailRes = await fetch(`${BASE_URL}/${type}/${item.id}?api_key=${API_KEY}`);
+                    const details = await detailRes.json();
+                    return { ...item, details };
+                }));
+                renderDetailedGrid(detailedItems);
             } catch (err) {
-                console.error('Fetch trending failed:', err);
-                const grid = document.getElementById('media-grid');
-                if (grid) {
-                    grid.innerHTML = '<div class="col-span-full text-center text-zinc-500 py-12 text-sm">Failed to load content. Please check your internet connection.</div>';
-                }
+                document.getElementById('media-grid').innerHTML = '<div class="col-span-full text-center text-zinc-500 py-12 text-sm">Failed to load content.</div>';
             }
         }
 
-        function renderGrid(items, forceType) {
+        function renderDetailedGrid(items) {
             const grid = document.getElementById('media-grid');
             if (!grid) return;
             grid.innerHTML = '';
-
             if (!items || items.length === 0) {
                 grid.innerHTML = `<div class="col-span-full text-center text-zinc-500 py-12 text-sm">No results found.</div>`;
                 return;
             }
-
             items.forEach(item => {
-                const type = forceType || item.media_type;
+                const type = item.media_type || activeType;
+                const details = item.details;
                 const title = item.title || item.name;
                 const year = (item.release_date || item.first_air_date || '').split('-')[0] || 'N/A';
-                const poster = item.poster_path
-                    ? `${IMAGE_URL}${item.poster_path}`
-                    : 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?q=80&w=342&auto=format&fit=crop';
-
+                const poster = item.poster_path ? `${IMAGE_URL}${item.poster_path}` : 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?q=80&w=500&auto=format&fit=crop';
+                const rating = details.vote_average ? details.vote_average.toFixed(1) : 'N/A';
+                const overview = details.overview || 'No description available.';
+                const genres = details.genres?.slice(0, 3).map(g => g.name) || [];
+                
                 const card = document.createElement('div');
-                card.className = "group cursor-pointer space-y-2 relative";
-                card.onclick = () => launchPlayer(type, item.id, title);
-
+                card.className = "group cursor-pointer bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden hover:border-zinc-700 transition-all duration-300 hover:shadow-xl";
+                card.onclick = () => showDetailModal(type, item.id, title);
                 card.innerHTML = `
-                    <div class="aspect-[2/3] w-full overflow-hidden rounded-md bg-zinc-900 border border-zinc-800 transition-colors group-hover:border-zinc-700 relative">
-                        <img src="${poster}" alt="${title}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
-                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center">
-                            <div class="bg-zinc-950/80 p-3 rounded-full border border-zinc-700 text-zinc-100 transform scale-90 group-hover:scale-100 transition-transform">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                    <div class="flex flex-col sm:flex-row">
+                        <div class="sm:w-40 lg:w-48 relative overflow-hidden">
+                            <img src="${poster}" alt="${title}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                <div class="bg-zinc-950/80 p-3 rounded-full border border-zinc-700 text-zinc-100">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="space-y-0.5 px-1">
-                        <h3 class="text-xs font-medium text-zinc-200 line-clamp-1 group-hover:text-white transition-colors tracking-tight">${escapeHtml(title)}</h3>
-                        <div class="flex items-center justify-between text-[10px] text-zinc-500 font-mono">
-                            <span>${year}</span>
-                            <span class="uppercase border border-zinc-800 px-1 rounded bg-zinc-900">${type}</span>
+                        <div class="flex-1 p-4 space-y-2">
+                            <div class="flex items-start justify-between gap-2">
+                                <h3 class="text-base font-semibold text-zinc-100 group-hover:text-white transition-colors line-clamp-1">${escapeHtml(title)}</h3>
+                                <span class="text-xs font-mono text-zinc-500 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800">${year}</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="text-yellow-500"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                    <span class="text-sm font-semibold ${getRatingColor(parseFloat(rating))}">${rating}</span>
+                                    <span class="text-xs text-zinc-500">/10</span>
+                                </div>
+                                <div class="text-xs text-zinc-400">${renderStars(parseFloat(rating))}</div>
+                            </div>
+                            ${genres.length > 0 ? `<div class="flex flex-wrap gap-1.5">${genres.map(g => `<span class="text-[10px] px-2 py-0.5 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300">${escapeHtml(g)}</span>`).join('')}</div>` : ''}
+                            <p class="text-xs text-zinc-400 leading-relaxed card-description">${escapeHtml(overview)}</p>
+                            <div class="flex items-center gap-2 pt-1">
+                                <span class="text-[10px] uppercase tracking-wider text-zinc-500 border-l-2 border-zinc-700 pl-2">${type === 'movie' ? 'MOVIE' : 'TV SERIES'}</span>
+                                ${type === 'movie' && details.runtime ? `<span class="text-[10px] text-zinc-500">⏱ ${details.runtime} min</span>` : ''}
+                            </div>
                         </div>
                     </div>
                 `;
@@ -537,62 +576,98 @@
             });
         }
 
+        async function showDetailModal(type, id, title) {
+            try {
+                const res = await fetch(`${BASE_URL}/${type}/${id}?api_key=${API_KEY}&append_to_response=credits`);
+                const data = await res.json();
+                
+                const backdrop = data.backdrop_path ? `${BACKDROP_URL}${data.backdrop_path}` : '';
+                const poster = data.poster_path ? `${IMAGE_URL}${data.poster_path}` : 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?q=80&w=500&auto=format&fit=crop';
+                const year = (data.release_date || data.first_air_date || '').split('-')[0] || 'N/A';
+                const rating = data.vote_average ? data.vote_average.toFixed(1) : 'N/A';
+                const runtime = type === 'movie' && data.runtime ? `${data.runtime} min` : type === 'tv' ? `${data.number_of_seasons} Season${data.number_of_seasons !== 1 ? 's' : ''}` : '';
+                const status = data.status || 'N/A';
+                const overview = data.overview || 'No description available.';
+                const genres = data.genres?.map(g => g.name) || [];
+                
+                const director = data.credits?.crew?.find(p => p.job === 'Director')?.name || 'N/A';
+                const cast = data.credits?.cast?.slice(0, 3).map(c => c.name).join(', ') || 'N/A';
+                
+                document.getElementById('modal-backdrop').style.backgroundImage = backdrop ? `linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(24,24,27,0.95)), url(${backdrop})` : '';
+                document.getElementById('modal-poster').src = poster;
+                document.getElementById('modal-title').innerText = title;
+                document.getElementById('modal-year').innerHTML = `<span class="text-zinc-500">📅</span> ${year}`;
+                document.getElementById('modal-runtime').innerHTML = `<span class="text-zinc-500">⏱</span> ${runtime}`;
+                document.getElementById('modal-status').innerHTML = `<span class="text-zinc-500">📺</span> ${status}`;
+                document.getElementById('modal-rating-text').innerText = rating;
+                document.getElementById('modal-stars').innerHTML = renderStars(parseFloat(rating));
+                document.getElementById('modal-overview').innerText = overview;
+                document.getElementById('modal-crew').innerHTML = `<div class="text-zinc-500 text-xs mb-1">Director</div><div class="text-zinc-300">${escapeHtml(director)}</div>`;
+                document.getElementById('modal-cast').innerHTML = `<div class="text-zinc-500 text-xs mb-1">Cast</div><div class="text-zinc-300 text-sm">${escapeHtml(cast)}</div>`;
+                
+                const genresHtml = genres.map(g => `<span class="text-xs px-2 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300">${escapeHtml(g)}</span>`).join('');
+                document.getElementById('modal-genres').innerHTML = genresHtml;
+                
+                const circumference = 2 * Math.PI * 20;
+                const offset = circumference - (data.vote_average / 10) * circumference;
+                document.getElementById('modal-rating-circle').style.strokeDasharray = `${circumference}`;
+                document.getElementById('modal-rating-circle').style.strokeDashoffset = offset;
+                
+                const watchBtn = document.getElementById('modal-watch-btn');
+                watchBtn.onclick = () => {
+                    closeDetailModal();
+                    launchPlayer(type, id, title);
+                };
+                
+                document.getElementById('detail-modal').classList.remove('hidden');
+                document.getElementById('detail-modal').classList.add('flex');
+            } catch (err) {
+                console.error('Failed to load details:', err);
+            }
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detail-modal').classList.add('hidden');
+            document.getElementById('detail-modal').classList.remove('flex');
+        }
+
         function escapeHtml(str) {
             if (!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
+            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
         }
 
         async function launchPlayer(type, id, title = '') {
             activeType = type;
             activeId = id;
-            activeTitle = title || `Asset Vector ${id}`;
+            activeTitle = title;
             activeSeason = 1;
             activeEpisode = 1;
             
-            const homeView = document.getElementById('home-view');
-            const playerView = document.getElementById('player-view');
-            const navSearch = document.getElementById('nav-search-container');
-            
-            if (homeView) homeView.classList.add('hidden');
-            if (playerView) playerView.classList.remove('hidden');
-            if (navSearch) navSearch.classList.remove('hidden');
-            
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('player-view').classList.remove('hidden');
+            document.getElementById('nav-search-container').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
             if (type === 'tv') {
-                const tvControls = document.getElementById('tv-controls');
-                if (tvControls) tvControls.classList.remove('hidden');
+                document.getElementById('tv-controls').classList.remove('hidden');
                 try {
                     const res = await fetch(`${BASE_URL}/tv/${id}?api_key=${API_KEY}`);
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
                     const data = await res.json();
                     activeTitle = data.name;
-                    
                     retrieveSavedProgressMarker();
-
                     const selector = document.getElementById('season-select');
-                    if (selector) {
-                        selector.innerHTML = '';
-                        for (let i = 1; i <= data.number_of_seasons; i++) {
-                            const opt = document.createElement('option');
-                            opt.value = i;
-                            opt.innerText = `Season ${i}`;
-                            if(i === activeSeason) opt.selected = true;
-                            selector.appendChild(opt);
-                        }
+                    selector.innerHTML = '';
+                    for (let i = 1; i <= data.number_of_seasons; i++) {
+                        const opt = document.createElement('option');
+                        opt.value = i;
+                        opt.innerText = `Season ${i}`;
+                        if(i === activeSeason) opt.selected = true;
+                        selector.appendChild(opt);
                     }
                     await buildEpisodeGrid(id, activeSeason);
-                } catch(err) {
-                    console.error('Failed to load TV show details:', err);
-                }
+                } catch(err) { console.error(err); }
             } else {
-                const tvControls = document.getElementById('tv-controls');
-                if (tvControls) tvControls.classList.add('hidden');
+                document.getElementById('tv-controls').classList.add('hidden');
                 updatePlayerUrl();
                 recordWatchHistory();
             }
@@ -601,20 +676,13 @@
         async function buildEpisodeGrid(id, seasonNum) {
             try {
                 const res = await fetch(`${BASE_URL}/tv/${id}/season/${seasonNum}?api_key=${API_KEY}`);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
                 const grid = document.getElementById('episode-grid');
-                if (!grid) return;
                 grid.innerHTML = '';
-
                 data.episodes.forEach(ep => {
                     const btn = document.createElement('button');
                     btn.innerText = ep.episode_number;
-                    btn.className = `h-8 text-xs font-mono rounded border transition-all ${
-                        ep.episode_number === activeEpisode 
-                        ? 'bg-zinc-100 border-zinc-100 text-zinc-950 font-bold' 
-                        : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-zinc-100'
-                    }`;
+                    btn.className = `h-8 text-xs font-mono rounded border transition-all ${ep.episode_number === activeEpisode ? 'bg-zinc-100 border-zinc-100 text-zinc-950 font-bold' : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-zinc-100'}`;
                     btn.onclick = () => {
                         activeSeason = seasonNum;
                         activeEpisode = ep.episode_number;
@@ -624,54 +692,35 @@
                     };
                     grid.appendChild(btn);
                 });
-
                 updatePlayerUrl();
-            } catch(err) {
-                console.error('Failed to load episodes:', err);
-            }
+            } catch(err) { console.error(err); }
         }
 
         function onSeasonChange() {
-            const seasonSelect = document.getElementById('season-select');
-            if (seasonSelect) {
-                activeSeason = parseInt(seasonSelect.value);
-                activeEpisode = 1; 
-                buildEpisodeGrid(activeId, activeSeason);
-            }
+            activeSeason = parseInt(document.getElementById('season-select').value);
+            activeEpisode = 1; 
+            buildEpisodeGrid(activeId, activeSeason);
         }
 
         function updatePlayerUrl() {
-            const provider = document.getElementById('provider-select')?.value || 'vidkingnet';
+            const provider = document.getElementById('provider-select').value;
             const target = getEmbedUrl(provider, activeType, activeId, activeSeason, activeEpisode);
             const iframe = document.getElementById('video-iframe');
-            if (iframe && iframe.src !== target) {
-                iframe.src = target;
-            }
+            if (iframe.src !== target) iframe.src = target;
         }
 
         function showHome(e) {
             if (e) e.preventDefault();
-            const iframe = document.getElementById('video-iframe');
-            if (iframe) iframe.src = ""; 
-            const playerView = document.getElementById('player-view');
-            const navSearch = document.getElementById('nav-search-container');
-            const homeView = document.getElementById('home-view');
-            
-            if (playerView) playerView.classList.add('hidden');
-            if (navSearch) navSearch.classList.add('hidden');
-            if (homeView) homeView.classList.remove('hidden');
-            
-            const heroSearch = document.getElementById('hero-search-input');
-            const navSearchInput = document.getElementById('nav-search-input');
-            if (heroSearch) heroSearch.value = "";
-            if (navSearchInput) navSearchInput.value = "";
-            
-            // Reset search query and show pagination
+            document.getElementById('video-iframe').src = "";
+            document.getElementById('player-view').classList.add('hidden');
+            document.getElementById('nav-search-container').classList.add('hidden');
+            document.getElementById('home-view').classList.remove('hidden');
+            document.getElementById('hero-search-input').value = "";
+            document.getElementById('nav-search-input').value = "";
             currentSearchQuery = '';
             document.getElementById('prev-page-btn').style.display = 'flex';
             document.getElementById('next-page-btn').style.display = 'flex';
             document.getElementById('page-indicator').style.display = 'flex';
-            
             syncDashboardUI();
             trendingPage = 1;
             fetchTrending(activeType, true);
@@ -681,115 +730,52 @@
         function syncDashboardUI() {
             const panel = document.getElementById('tracker-dashboard-panel');
             const historyContainer = document.getElementById('panel-history-container');
-            
             if (!storageAvailable || !panel || !historyContainer) return;
-            
             let localHistory = [];
-            try {
-                const raw = localStorage.getItem('hylton_local_history');
-                localHistory = raw ? JSON.parse(raw) : [];
-            } catch (e) {
-                console.warn('Failed to parse history:', e);
-                localHistory = [];
-            }
-
+            try { localHistory = JSON.parse(localStorage.getItem('hylton_local_history')) || []; } catch(e) {}
             if(localHistory.length > 0) {
                 panel.classList.remove('hidden');
                 historyContainer.innerHTML = '';
-                
                 [...localHistory].reverse().slice(0, 10).forEach(record => {
                     const cell = document.createElement('div');
                     cell.className = "flex items-center justify-between text-xs bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-800 rounded px-3 py-2 transition-colors cursor-pointer group";
-                    
-                    let runtimeLabel = `<span class="text-[10px] uppercase font-mono tracking-wider border border-zinc-800 bg-zinc-950 px-1.5 rounded py-0.5 text-zinc-400 group-hover:text-zinc-200">Movie</span>`;
-                    if(record.type === 'tv') {
-                        runtimeLabel = `<span class="text-[10px] uppercase font-mono tracking-wider border border-zinc-700 bg-zinc-900 px-1.5 rounded py-0.5 text-zinc-100 font-bold">S${record.season} E${record.episode}</span>`;
-                    }
-
-                    cell.innerHTML = `
-                        <div class="flex flex-col max-w-[70%]">
-                            <span class="font-medium text-zinc-300 group-hover:text-white line-clamp-1 truncate">${escapeHtml(record.title || 'Unknown')}</span>
-                            <span class="text-[9px] font-mono text-zinc-600 mt-0.5">${record.timestamp ? new Date(record.timestamp).toLocaleDateString() : 'Unknown date'}</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            ${runtimeLabel}
-                        </div>
-                    `;
-                    cell.onclick = (e) => {
-                        e.stopPropagation();
-                        resumePlaybackFromRecord(record);
-                    };
+                    let runtimeLabel = record.type === 'tv' ? `<span class="text-[10px] uppercase font-mono tracking-wider border border-zinc-700 bg-zinc-900 px-1.5 rounded py-0.5 text-zinc-100 font-bold">S${record.season} E${record.episode}</span>` : `<span class="text-[10px] uppercase font-mono tracking-wider border border-zinc-800 bg-zinc-950 px-1.5 rounded py-0.5 text-zinc-400">Movie</span>`;
+                    cell.innerHTML = `<div class="flex flex-col max-w-[70%]"><span class="font-medium text-zinc-300 group-hover:text-white truncate">${escapeHtml(record.title)}</span><span class="text-[9px] text-zinc-600 mt-0.5">${new Date(record.timestamp).toLocaleDateString()}</span></div>${runtimeLabel}`;
+                    cell.onclick = (e) => { e.stopPropagation(); resumePlaybackFromRecord(record); };
                     historyContainer.appendChild(cell);
                 });
-            } else {
-                panel.classList.add('hidden');
-                historyContainer.innerHTML = '';
-            }
+            } else { panel.classList.add('hidden'); }
         }
 
         function recordWatchHistory() {
             if (!storageAvailable) return;
-            
-            let localHistory = [];
-            try {
-                const raw = localStorage.getItem('hylton_local_history');
-                localHistory = raw ? JSON.parse(raw) : [];
-            } catch (e) {
-                console.warn('Failed to parse history:', e);
-            }
-            
+            let localHistory = JSON.parse(localStorage.getItem('hylton_local_history')) || [];
             localHistory = localHistory.filter(item => item.id !== activeId.toString());
-
-            const historyItem = {
-                id: activeId.toString(),
-                type: activeType,
-                title: activeTitle,
-                season: activeSeason,
-                episode: activeEpisode,
-                timestamp: Date.now()
-            };
-
-            localHistory.push(historyItem);
+            localHistory.push({ id: activeId.toString(), type: activeType, title: activeTitle, season: activeSeason, episode: activeEpisode, timestamp: Date.now() });
             if (localHistory.length > 50) localHistory = localHistory.slice(-50);
-            
-            try {
-                localStorage.setItem('hylton_local_history', JSON.stringify(localHistory));
-            } catch (e) {
-                console.warn('Failed to save history:', e);
-            }
+            localStorage.setItem('hylton_local_history', JSON.stringify(localHistory));
         }
 
         function retrieveSavedProgressMarker() {
             if (!storageAvailable) return;
-            
-            try {
-                const raw = localStorage.getItem('hylton_local_history');
-                const localHistory = raw ? JSON.parse(raw) : [];
-                const matchingRecord = localHistory.find(item => item.id === activeId.toString() && item.type === 'tv');
-                
-                if(matchingRecord) {
-                    activeSeason = parseInt(matchingRecord.season) || 1;
-                    activeEpisode = parseInt(matchingRecord.episode) || 1;
-                }
-            } catch (e) {
-                console.warn('Failed to retrieve progress:', e);
-            }
+            const localHistory = JSON.parse(localStorage.getItem('hylton_local_history')) || [];
+            const match = localHistory.find(item => item.id === activeId.toString() && item.type === 'tv');
+            if(match) { activeSeason = match.season; activeEpisode = match.episode; }
         }
 
         function resumePlaybackFromRecord(record) {
             launchPlayer(record.type, record.id, record.title);
             if(record.type === 'tv') {
-                activeSeason = parseInt(record.season);
-                activeEpisode = parseInt(record.episode);
-                const selector = document.getElementById('season-select');
-                if(selector) selector.value = activeSeason;
+                activeSeason = record.season;
+                activeEpisode = record.episode;
+                document.getElementById('season-select').value = activeSeason;
                 buildEpisodeGrid(record.id, activeSeason);
             }
         }
 
         function clearDeviceHistory() {
             if(confirm("Clear your watch history from this device?")) {
-                removeItem('hylton_local_history');
+                localStorage.removeItem('hylton_local_history');
                 syncDashboardUI();
             }
         }
