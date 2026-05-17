@@ -217,7 +217,7 @@
         function getEmbedUrl(provider, type, id, s = 1, e = 1) {
             switch(provider) {
                 case 'vidking':   
-                    return `https://vidking.link/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`;
+                    return type === 'movie' ? `https://vidking.net/embed/movie/${id}` : `https://vidking.net/embed/tv/${id}/${s}/${e}`;
                 case 'vidlink':
                     return type === 'movie' ? `https://vidlink.pro/movie/${id}` : `https://vidlink.pro/tv/${id}/${s}/${e}`;
                 case 'vidkingnet':
