@@ -3,17 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>hylton x nexus</title>
+    <title>hylton.net</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                        mono: ['Space Grotesk', 'sans-serif'],
+                        sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
                     }
                 }
             }
@@ -23,69 +21,49 @@
         body {
             background-color: #09090b;
             color: #fafafa;
-            transition: background-color 0.3s ease, color 0.3s ease;
         }
         
-        /* Themes Definition */
-        body.theme-zinc { --primary: #fafafa; --bg: #09090b; --panel: #18181b; --border: #27272a; --accent: #3f3f46; }
-        body.theme-amethyst { --primary: #c084fc; --bg: #0b0714; --panel: #130d24; --border: #2e1e4e; --accent: #6b21a8; }
-        body.theme-emerald { --primary: #34d399; --bg: #02120b; --panel: #052617; --border: #0f4026; --accent: #059669; }
-        body.theme-amber { --primary: #fbbf24; --bg: #120b02; --panel: #261705; --border: #40260f; --accent: #d97706; }
-        body.theme-crimson { --primary: #f87171; --bg: #140505; --panel: #260a0a; --border: #4a1515; --accent: #dc2626; }
-        body.theme-cyberpunk { --primary: #00ffcc; --bg: #0c0014; --panel: #1a0033; --border: #ff007f; --accent: #ff007f; }
+        body.theme-zinc { --primary: #3f3f46; }
+        body.theme-amethyst { --primary: #a855f7; }
+        body.theme-emerald { --primary: #10b981; }
+        body.theme-amber { --primary: #f59e0b; }
+        body.theme-crimson { --primary: #ef4444; }
+        body.theme-cyberpunk { --primary: #ff007f; }
 
-        body[class*="theme-"] {
-            background-color: var(--bg);
-        }
-        body[class*="theme-"] .border-zinc-800 { border-color: var(--border) !important; }
-        body[class*="theme-"] .bg-zinc-950 { background-color: var(--panel) !important; }
-        body[class*="theme-"] .bg-zinc-900 { background-color: var(--bg) !important; }
-        body[class*="theme-"] .text-zinc-100 { color: var(--primary) !important; }
+        .theme-accent-bg { background-color: var(--primary); }
+        .theme-accent-text { color: var(--primary); }
+        .theme-accent-border { border-color: var(--primary); }
 
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 99px; }
         ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
-        
-        .backdrop-blur-custom {
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased selection:bg-zinc-800 selection:text-zinc-100 theme-zinc">
+<body class="min-h-screen flex flex-col antialiased font-sans theme-zinc">
 
     <!-- TOP NAVIGATION BAR -->
-    <header class="border-b border-zinc-800 bg-zinc-950/70 backdrop-blur-custom sticky top-0 z-50 transition-all duration-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
-            <div class="flex items-center gap-3 cursor-pointer" onclick="showHome(event)">
-                <div class="w-8 h-8 rounded-lg overflow-hidden border border-zinc-700 bg-zinc-900 flex items-center justify-center shadow-inner">
-                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=60" alt="Hylton Node Avatar" class="w-full h-full object-cover">
-                </div>
-                <span class="text-sm font-semibold tracking-tight font-mono text-zinc-100">hylton.net</span>
+    <header class="border-b border-zinc-800 bg-zinc-950/80 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+            <div class="flex items-center cursor-pointer" onclick="showHome(event)">
+                <span class="text-base font-bold tracking-tight text-zinc-100">hylton.net</span>
             </div>
             
-            <!-- ADVANCED FILTERBAR (HIDDEN IN DETAILED VIEW MODE) -->
-            <div id="nav-search-container" class="hidden flex-1 max-w-xl mx-auto">
-                <div class="relative flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 focus-within:border-zinc-500 transition-all">
+            <!-- SEARCH BAR -->
+            <div class="flex-1 max-w-xl mx-auto">
+                <div class="relative flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-md px-3 py-1.5 focus-within:border-zinc-700 transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" class="text-zinc-500 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                    <input type="text" id="nav-search-input" placeholder="Query Matrix (Titles, Actors, Tags)..." class="w-full bg-transparent text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none">
-                    <select id="search-filter-genre" onchange="triggerAdvancedSearch()" class="bg-zinc-950 text-zinc-400 text-[11px] border border-zinc-800 rounded px-1.5 py-0.5 outline-none max-w-[90px] md:max-w-none">
-                        <option value="">All Tags</option>
+                    <input type="text" id="nav-search-input" placeholder="Search movies, tv shows, actors..." class="w-full bg-transparent text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none">
+                    <select id="search-filter-genre" onchange="triggerAdvancedSearch()" class="bg-zinc-950 text-zinc-400 text-xs border border-zinc-800 rounded px-1.5 py-0.5 outline-none">
+                        <option value="">All Genres</option>
                         <option value="28">Action</option>
                         <option value="12">Adventure</option>
                         <option value="16">Animation</option>
                         <option value="35">Comedy</option>
                         <option value="80">Crime</option>
-                        <option value="99">Documentary</option>
                         <option value="18">Drama</option>
-                        <option value="10751">Family</option>
                         <option value="14">Fantasy</option>
-                        <option value="36">History</option>
                         <option value="27">Horror</option>
-                        <option value="10402">Music</option>
-                        <option value="9648">Mystery</option>
-                        <option value="10749">Romance</option>
                         <option value="878">Sci-Fi</option>
                         <option value="53">Thriller</option>
                     </select>
@@ -93,416 +71,181 @@
             </div>
 
             <div class="flex items-center gap-3 shrink-0">
-                <select id="provider-select" onchange="onProviderChange()" class="bg-zinc-900 border border-zinc-800 rounded px-2 py-1 text-xs text-zinc-300 font-mono focus:outline-none cursor-pointer hidden sm:block">
+                <select id="provider-select" onchange="onProviderChange()" class="bg-zinc-900 border border-zinc-800 rounded px-2 py-1 text-xs text-zinc-300 focus:outline-none cursor-pointer">
                     <option value="vidkingnet" selected>VidKing.net</option>
                     <option value="vidlink">VidLink.pro</option>
                     <option value="vidsrcto">VidSrc.to</option>
                     <option value="vidsrccc">VidSrc.cc</option>
                     <option value="embedsu">Embed.su</option>
-                    <option value="autoembed">AutoEmbed</option>
                 </select>
-                <button onclick="toggleSettingsModal()" class="w-9 h-9 flex items-center justify-center border border-zinc-800 rounded-lg bg-zinc-900 text-zinc-400 hover:text-zinc-100 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                <button onclick="toggleSettingsModal()" class="w-9 h-9 flex items-center justify-center border border-zinc-800 rounded-md bg-zinc-900 text-zinc-400 hover:text-zinc-100 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                 </button>
             </div>
         </div>
     </header>
 
     <!-- CORE WORKSPACE -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 transition-all">
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
         
         <!-- EXPLORATION COMPONENT (HOME) -->
-        <section id="home-view" class="space-y-8 animate-in fade-in duration-300">
-            <!-- CONTINUATION ENGINE -->
-            <div id="tracker-dashboard-panel" class="max-w-2xl mx-auto bg-zinc-950 border border-zinc-800 rounded-xl p-4 shadow-2xl space-y-3 hidden">
+        <section id="home-view" class="space-y-6">
+            <!-- WATCH HISTORY HISTORY -->
+            <div id="tracker-dashboard-panel" class="bg-zinc-950 border border-zinc-800 rounded-lg p-4 space-y-3 hidden">
                 <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
-                    <div class="flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 font-mono">Telemetry Data: Resumable Buffers</h3>
-                    </div>
-                    <button onclick="clearDeviceHistory()" class="text-[10px] text-zinc-500 hover:text-zinc-300 transition-colors font-mono uppercase">Purge All</button>
+                    <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Continue Watching</h3>
+                    <button onclick="clearDeviceHistory()" class="text-xs text-zinc-500 hover:text-zinc-300 transition-colors">Clear History</button>
                 </div>
-                <div id="panel-history-container" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto"></div>
+                <div id="panel-history-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2"></div>
             </div>
 
-            <!-- SEARCH HUB -->
-            <div class="text-center max-w-xl mx-auto space-y-4 py-6">
-                <div class="space-y-1">
-                    <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-100 font-mono">NEXUS EXPLORATION INTERFACE</h1>
-                    <p class="text-xs text-zinc-500 max-w-sm mx-auto">Decentralized client indexing engine synced across localized nodes.</p>
-                </div>
-                <div class="space-y-3 bg-zinc-950 p-4 border border-zinc-800 rounded-xl shadow-xl">
-                    <div class="relative">
-                        <input type="text" id="hero-search-input" placeholder="Type metadata parameters..." class="w-full h-11 bg-zinc-900 border border-zinc-800 rounded-lg pl-10 pr-4 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all">
-                        <div class="absolute left-3 top-3.5 text-zinc-500">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-3 gap-2 text-[11px] font-mono">
-                        <select id="hero-genre" onchange="triggerAdvancedSearch()" class="bg-zinc-900 border border-zinc-800 text-zinc-400 rounded p-1.5 outline-none w-full">
-                            <option value="">Genres: All</option>
-                            <option value="28">Action</option><option value="12">Adventure</option><option value="16">Animation</option><option value="35">Comedy</option><option value="80">Crime</option><option value="18">Drama</option><option value="878">Sci-Fi</option>
-                        </select>
-                        <select id="hero-rating" onchange="triggerAdvancedSearch()" class="bg-zinc-900 border border-zinc-800 text-zinc-400 rounded p-1.5 outline-none w-full">
-                            <option value="">Rating: All</option>
-                            <option value="8">8.0+ Core</option>
-                            <option value="7">7.0+ Core</option>
-                            <option value="6">6.0+ Core</option>
-                        </select>
-                        <select id="hero-year" onchange="triggerAdvancedSearch()" class="bg-zinc-900 border border-zinc-800 text-zinc-400 rounded p-1.5 outline-none w-full">
-                            <option value="">Era: All</option>
-                            <option value="2026">2026</option>
-                            <option value="2025">2025</option>
-                            <option value="2024">2024</option>
-                            <option value="2023">2023</option>
-                            <option value="2020">2020s</option>
-                            <option value="2010">2010s</option>
-                        </select>
-                    </div>
+            <!-- TRENDING HEADER -->
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                <h2 id="section-title" class="text-lg font-bold text-zinc-100 flex items-center gap-2">
+                    Trending Now
+                </h2>
+                <div class="flex items-center gap-2 text-sm">
+                    <button onclick="switchMediaStream('movie')" id="toggle-movie" class="px-3 py-1 rounded-md bg-zinc-800 text-zinc-100 font-medium transition-all">Movies</button>
+                    <button onclick="switchMediaStream('tv')" id="toggle-tv" class="px-3 py-1 rounded-md text-zinc-400 hover:text-zinc-200 transition-all">TV Shows</button>
                 </div>
             </div>
+            
+            <!-- MEDIA GRID -->
+            <div id="media-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"></div>
 
-            <!-- CONTENT STREAMS -->
-            <div class="space-y-6">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-3">
-                    <h2 id="section-title" class="text-base font-bold tracking-tight font-mono uppercase flex items-center gap-2 text-zinc-200">
-                        <span class="w-1.5 h-3 bg-zinc-400 inline-block"></span>Trending Matrices
-                    </h2>
-                    <div class="flex items-center gap-2 self-start sm:self-auto text-xs">
-                        <button onclick="switchMediaStream('movie')" id="toggle-movie" class="px-3 py-1.5 rounded-md font-mono bg-zinc-800 text-zinc-100 font-medium transition-all">Movies</button>
-                        <button onclick="switchMediaStream('tv')" id="toggle-tv" class="px-3 py-1.5 rounded-md font-mono text-zinc-400 hover:text-zinc-200 transition-all">TV Shows</button>
-                    </div>
-                </div>
-                
-                <!-- MOUNTING HOOK FOR CARDS -->
-                <div id="media-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"></div>
-
-                <!-- MATRIX PAGINATION CONTROLLER -->
-                <div class="flex items-center justify-between pt-6 border-t border-zinc-800 font-mono text-xs">
-                    <button id="btn-prev-page" onclick="traversePage(-1)" class="px-3 py-1.5 rounded border border-zinc-800 bg-zinc-950 text-zinc-400 hover:text-zinc-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
-                        &larr; Prev Node
-                    </button>
-                    <span id="page-indicator" class="text-zinc-500 font-medium">Node Page 01</span>
-                    <button id="btn-next-page" onclick="traversePage(1)" class="px-3 py-1.5 rounded border border-zinc-800 bg-zinc-950 text-zinc-400 hover:text-zinc-100 transition-all">
-                        Next Node &rarr;
-                    </button>
-                </div>
+            <!-- PAGINATION -->
+            <div class="flex items-center justify-between pt-4 border-t border-zinc-800 text-sm">
+                <button id="btn-prev-page" onclick="traversePage(-1)" class="px-3 py-1.5 rounded border border-zinc-800 bg-zinc-950 text-zinc-400 hover:text-zinc-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                    Previous
+                </button>
+                <span id="page-indicator" class="text-zinc-400">Page 1</span>
+                <button id="btn-next-page" onclick="traversePage(1)" class="px-3 py-1.5 rounded border border-zinc-800 bg-zinc-950 text-zinc-400 hover:text-zinc-100 transition-all">
+                    Next
+                </button>
             </div>
         </section>
 
-        <!-- IMMERSIVE MULTIMEDIA WORKSTATION (PLAYERVIEW) -->
-        <section id="player-view" class="hidden space-y-6 animate-in fade-in duration-300">
-            <button onclick="showHome()" class="inline-flex items-center gap-2 text-xs text-zinc-400 hover:text-zinc-100 font-mono transition-all">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
-                Return to Node Grid
+        <!-- IMMERSIVE PLAYER VIEW -->
+        <section id="player-view" class="hidden space-y-6">
+            <button onclick="showHome()" class="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-100 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+                Back to browse
             </button>
 
-            <!-- PIPELINE STREAMS & VIDEO CORE -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- VIDEO CONTAINER -->
                 <div class="lg:col-span-2 space-y-4">
-                    <div class="bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden shadow-2xl relative group">
-                        <div class="w-full aspect-video bg-black relative">
+                    <div class="bg-black border border-zinc-800 rounded-lg overflow-hidden shadow-2xl relative">
+                        <div class="w-full aspect-video relative">
                             <iframe id="video-iframe" src="" allowfullscreen class="absolute inset-0 w-full h-full border-0" allow="autoplay; encrypted-media"></iframe>
-                        </div>
-                    </div>
-                    
-                    <!-- DYNAMIC DIRECTIVES & ACTIONS PANEL -->
-                    <div class="flex flex-wrap items-center justify-between gap-3 bg-zinc-950 p-3 border border-zinc-800 rounded-lg text-xs">
-                        <div class="flex items-center gap-3">
-                            <span class="text-zinc-400 font-mono">Pipeline Core:</span>
-                            <select id="player-inline-provider" onchange="syncInlineProvider()" class="bg-zinc-900 border border-zinc-800 text-zinc-200 rounded px-2 py-1 font-mono outline-none cursor-pointer">
-                                <option value="vidkingnet">VidKing.net</option>
-                                <option value="vidlink">VidLink.pro</option>
-                                <option value="vidsrcto">VidSrc.to</option>
-                                <option value="vidsrccc">VidSrc.cc</option>
-                                <option value="embedsu">Embed.su</option>
-                            </select>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="adjustCinematicLight()" class="px-2.5 py-1 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-zinc-200 rounded font-mono">Lights</button>
-                            <button onclick="reloadActiveNode()" class="px-2.5 py-1 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-zinc-200 rounded font-mono">Reboot Frame</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- METADATA INFORMATION & INTEL CORES PANEL -->
-                <div class="space-y-4">
-                    <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-5 space-y-4 shadow-xl">
+                <!-- METADATA & SHADCN CHATBOX -->
+                <div class="space-y-4 flex flex-col h-full">
+                    <div class="bg-zinc-950 border border-zinc-800 rounded-lg p-5 space-y-3 shadow-xl">
                         <div class="space-y-1">
                             <div class="flex flex-wrap items-center gap-2">
-                                <span id="meta-rating" class="bg-amber-500/10 border border-amber-500/30 text-amber-400 px-1.5 py-0.5 rounded font-mono text-[10px] font-bold">8.4</span>
-                                <span id="meta-year" class="text-zinc-400 font-mono text-xs">2024</span>
-                                <span id="meta-genres" class="text-zinc-500 text-[11px] font-sans truncate max-w-[180px]">Sci-Fi, Action</span>
+                                <span id="meta-rating" class="bg-amber-500/10 border border-amber-500/30 text-amber-400 px-1.5 py-0.5 rounded text-xs font-bold">★ 0.0</span>
+                                <span id="meta-year" class="text-zinc-400 text-xs">0000</span>
+                                <span id="meta-genres" class="text-zinc-500 text-xs truncate max-w-[180px]">Genres</span>
                             </div>
-                            <h2 id="meta-title" class="text-lg font-bold tracking-tight text-zinc-100 font-mono line-clamp-1">Asset Pipeline</h2>
+                            <h2 id="meta-title" class="text-xl font-bold text-zinc-100 tracking-tight">Title</h2>
                         </div>
 
-                        <p id="meta-overview" class="text-xs text-zinc-400 leading-relaxed font-sans line-clamp-4">Fetching active description index from global registry database...</p>
+                        <p id="meta-overview" class="text-sm text-zinc-400 leading-relaxed line-clamp-4">Loading summary description...</p>
                         
-                        <div class="space-y-2 pt-2 border-t border-zinc-900">
-                            <h4 class="text-[11px] uppercase font-mono tracking-wider text-zinc-500 font-bold">Cast Protocols</h4>
-                            <p id="meta-cast" class="text-xs text-zinc-300 font-sans leading-relaxed">Matrix scanning actors...</p>
+                        <div class="space-y-1 pt-2 border-t border-zinc-900">
+                            <h4 class="text-xs uppercase font-semibold tracking-wider text-zinc-500">Starring</h4>
+                            <p id="meta-cast" class="text-sm text-zinc-300">Loading actors...</p>
+                        </div>
+                    </div>
+
+                    <!-- SHADCN STYLE CHAT BOX INTERFACE -->
+                    <div class="bg-zinc-950 border border-zinc-800 rounded-lg shadow-xl flex flex-col flex-1 min-h-[320px] max-h-[450px]">
+                        <!-- Chat Header -->
+                        <div class="p-3 border-b border-zinc-800 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-zinc-400 theme-accent-bg"></span>
+                                <span class="text-xs font-semibold text-zinc-200">Ask AI Assistant</span>
+                            </div>
+                            <span class="text-[10px] text-zinc-500 bg-zinc-900 px-1.5 py-0.5 rounded border border-zinc-800">Gemini Flash</span>
+                        </div>
+                        
+                        <!-- Messages Output Area -->
+                        <div id="chat-messages" class="flex-1 p-3 overflow-y-auto space-y-3 text-xs">
+                            <div class="flex gap-2 items-start max-w-[85%]">
+                                <div class="bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-zinc-300">
+                                    Don't understand something about this movie or show? Ask me anything about the plot, characters, lore, or confusion!
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- INTEGRATED AI PROTOCOL BAR -->
-                        <div class="pt-3 border-t border-zinc-900 space-y-2">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-1.5">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
-                                    <h4 class="text-[11px] uppercase font-mono tracking-wider text-cyan-400 font-bold">Gemini Intel Assistant</h4>
-                                </div>
-                                <button onclick="triggerGeminiQuery()" class="text-[10px] bg-cyan-950 border border-cyan-800/80 hover:border-cyan-600 text-cyan-400 px-2 py-0.5 rounded font-mono transition-all">Compute</button>
-                            </div>
-                            <div id="ai-response-block" class="text-[11px] bg-zinc-900/40 p-2.5 border border-zinc-900 rounded text-zinc-400 max-h-36 overflow-y-auto font-sans leading-relaxed">
-                                Ready to generate predictive context blueprints for this asset. Click compute to parse narrative vector.
-                            </div>
+                        <!-- Chat Input Bar -->
+                        <div class="p-2 border-t border-zinc-800 bg-zinc-900/50">
+                            <form id="chat-form" onsubmit="handleChatSubmit(event)" class="flex gap-1.5">
+                                <input type="text" id="chat-input" placeholder="Ask about the plot, ending, details..." class="flex-1 bg-zinc-900 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-700">
+                                <button type="submit" class="bg-zinc-100 hover:bg-zinc-200 text-zinc-950 px-3 py-1.5 rounded font-medium text-xs transition-colors flex items-center justify-center">
+                                    Send
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- TV NAVIGATION MATRIX COMPONENT -->
-            <div id="tv-controls" class="hidden bg-zinc-950 border border-zinc-800 rounded-xl p-4 space-y-4 shadow-xl">
+            <!-- TV SHOW CONTROLS -->
+            <div id="tv-controls" class="hidden bg-zinc-950 border border-zinc-800 rounded-lg p-4 space-y-3 shadow-xl">
                 <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
-                    <h4 class="text-xs font-bold font-mono uppercase tracking-wider text-zinc-400">Structural Navigation Grid</h4>
+                    <h4 class="text-sm font-bold text-zinc-300">Episodes</h4>
                     <div class="flex items-center gap-2">
-                        <span class="text-[11px] font-mono text-zinc-500">Node Cluster:</span>
-                        <select id="season-select" onchange="onSeasonChange()" class="bg-zinc-900 border border-zinc-800 rounded px-2 py-0.5 text-xs font-mono text-zinc-300 focus:outline-none cursor-pointer">
+                        <span class="text-xs text-zinc-500">Season:</span>
+                        <select id="season-select" onchange="onSeasonChange()" class="bg-zinc-900 border border-zinc-800 rounded px-2 py-0.5 text-xs text-zinc-300 focus:outline-none cursor-pointer">
                         </select>
                     </div>
                 </div>
-                <div id="episode-grid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-1.5"></div>
+                <div id="episode-grid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-2"></div>
             </div>
         </section>
     </main>
 
-    <!-- ROBUST SETTINGS CONTROL PANEL MODAL (30+ SYSTEM INJECTORS) -->
-    <div id="settings-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-custom">
-        <div class="bg-zinc-950 border border-zinc-800 rounded-xl max-w-2xl w-full max-h-[85vh] shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <!-- HEADER -->
+    <!-- SIMPLIFIED SETTINGS MODAL -->
+    <div id="settings-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-zinc-950/80">
+        <div class="bg-zinc-950 border border-zinc-800 rounded-lg max-w-sm w-full shadow-2xl flex flex-col overflow-hidden">
             <div class="flex items-center justify-between p-4 border-b border-zinc-800 bg-zinc-900/50">
-                <div class="space-y-0.5">
-                    <h3 class="text-sm font-bold tracking-tight text-zinc-200 font-mono uppercase">System Node Parameter Matrix</h3>
-                    <p class="text-[11px] text-zinc-500">Fine-tune global interface configurations, fallbacks and pipeline structures.</p>
-                </div>
-                <button onclick="toggleSettingsModal()" class="text-zinc-500 hover:text-zinc-300 transition-colors">
+                <h3 class="text-sm font-bold text-zinc-200">Interface Settings</h3>
+                <button onclick="toggleSettingsModal()" class="text-zinc-500 hover:text-zinc-300">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
 
-            <!-- OPTIONS MATRIX CORE -->
-            <div class="p-6 overflow-y-auto space-y-6 text-xs flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                
-                <!-- SECTION 1: GLOBAL VISUAL ENGINE & VISUAL MAPS -->
-                <div class="md:col-span-2 border-b border-zinc-900 pb-2">
-                    <h4 class="font-mono text-zinc-300 uppercase tracking-wider font-bold text-[11px] text-zinc-100">1. CORE SYSTEM THEME</h4>
-                    <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 pt-2">
-                        <button onclick="applyVisualTheme('zinc')" class="p-2 rounded border border-zinc-800 bg-zinc-900 text-center font-mono hover:border-zinc-500 text-[10px]">Zinc Dark</button>
-                        <button onclick="applyVisualTheme('amethyst')" class="p-2 rounded border border-purple-950 bg-purple-950/20 text-purple-300 text-center font-mono hover:border-purple-500 text-[10px]">Amethyst</button>
-                        <button onclick="applyVisualTheme('emerald')" class="p-2 rounded border border-emerald-950 bg-emerald-950/20 text-emerald-300 text-center font-mono hover:border-emerald-500 text-[10px]">Emerald</button>
-                        <button onclick="applyVisualTheme('amber')" class="p-2 rounded border border-amber-950 bg-amber-950/20 text-amber-300 text-center font-mono hover:border-amber-500 text-[10px]">Amber</button>
-                        <button onclick="applyVisualTheme('crimson')" class="p-2 rounded border border-red-950 bg-red-950/20 text-red-300 text-center font-mono hover:border-red-500 text-[10px]">Crimson</button>
-                        <button onclick="applyVisualTheme('cyberpunk')" class="p-2 rounded border border-pink-900 bg-purple-950 text-cyan-400 text-center font-mono hover:border-cyan-400 text-[10px]">Cyberpunk</button>
+            <div class="p-4 space-y-4 text-xs">
+                <div>
+                    <label class="block text-zinc-400 mb-1.5 font-medium">Interface Color Theme</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="applyVisualTheme('zinc')" class="p-2 rounded border border-zinc-800 bg-zinc-900 text-center hover:border-zinc-600">Zinc</button>
+                        <button onclick="applyVisualTheme('amethyst')" class="p-2 rounded border border-zinc-800 bg-zinc-900 text-center text-purple-400 hover:border-purple-600">Purple</button>
+                        <button onclick="applyVisualTheme('emerald')" class="p-2 rounded border border-zinc-800 bg-zinc-900 text-center text-emerald-400 hover:border-emerald-600">Emerald</button>
+                        <button onclick="applyVisualTheme('amber')" class="p-2 rounded border border-zinc-800 bg-zinc-900 text-center text-amber-400 hover:border-amber-600">Amber</button>
+                        <button onclick="applyVisualTheme('crimson')" class="p-2 rounded border border-zinc-800 bg-zinc-900 text-center text-red-400 hover:border-red-600">Crimson</button>
+                        <button onclick="applyVisualTheme('cyberpunk')" class="p-2 rounded border border-zinc-800 bg-zinc-900 text-center text-pink-500 hover:border-pink-600">Neon</button>
                     </div>
-                </div>
-
-                <!-- 30 CONFIGURATION INJECTORS GRID -->
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">01. Fallback Stream Router</label>
-                    <select id="cfg-01" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>VidKing.net (Primary)</option><option>VidLink Pro</option><option>VidSrc.to Stack</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">02. Media Indexing Region</label>
-                    <select id="cfg-02" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>Hong Kong Node</option><option>Global Gateway</option><option>US East Node</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">03. TMDB Proxy Bypass</label>
-                    <select id="cfg-03" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>Direct Connection</option><option>Cloudflare Worker</option><option>Cors-Anywhere Hook</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">04. Video Container Frame Rate</label>
-                    <select id="cfg-04" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>Auto (Synchronized)</option><option>Forced 24fps</option><option>Forced 60fps Bypass</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">05. Client Telemetry State</label>
-                    <select id="cfg-05" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>Active Memory Buffer</option><option>Zero Trace Sandbox</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">06. Poster Assets Resolution</label>
-                    <select id="cfg-06" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>w342 Standard compressed</option><option>Original High Bandwidth</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">07. Global Animation Frame Speed</label>
-                    <select id="cfg-07" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>Standard (150ms)</option><option>Instantaneous Acceleration</option><option>Disabled</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">08. Subtitle Encoding Node</label>
-                    <select id="cfg-08" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>UTF-8 Matrix</option><option>ISO-8859-1 Core</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">09. Iframe Sandbox Rigidity</label>
-                    <select id="cfg-09" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>Permissive Context Scripts</option><option>High Defense Shield</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">10. Default Content Stream</label>
-                    <select id="cfg-10" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>Trending Vector</option><option>Highest Rated Array</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">11. Pagination Multiplier Step</label>
-                    <select id="cfg-11" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>20 Assets Per Page</option><option>40 Assets Extended</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">12. History Compression Ratio</label>
-                    <select id="cfg-12" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>Lzw Matrix Compact</option><option>Raw String Plaintext</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">13. Font Rendering Engine</label>
-                    <select id="cfg-13" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>Plus Jakarta Sans Array</option><option>System Hard Mono</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">14. Advanced Search Multi-Match</label>
-                    <select id="cfg-14" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>Strict Intersection</option><option>Loose Aggregation</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">15. Gemini Temperature Array</label>
-                    <select id="cfg-15" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>0.2 Analytic Architecture</option><option>0.7 Narrative Creative</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">16. Image Fallback Layer</label>
-                    <select id="cfg-16" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>Unsplash Abstract Mesh</option><option>Solid Slate Monolith</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">17. Video Aspect Ration Override</label>
-                    <select id="cfg-17" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>Standard 16:9 Aspect</option><option>Cinematic 21:9 Stretch</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">18. Local Memory Storage Target</label>
-                    <select id="cfg-18" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>localStorage Vector</option><option>sessionStorage Only</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">19. Pre-fetch Next TV Episode</label>
-                    <select id="cfg-19" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>Enabled Pipeline Sync</option><option>Disabled (On Demand)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">20. UI Backdrop Blur Effect</label>
-                    <select id="cfg-20" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>High Definition Gaussian</option><option>Low Performance Flat</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">21. Auto-Resume Threshold</label>
-                    <select id="cfg-21" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>Prompt Selection Dialog</option><option>Forced Automatic Injection</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">22. API Cache Clock Time</label>
-                    <select id="cfg-22" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>60 Minutes Buffer</option><option>No Cache Refresh Always</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">23. Title Truncation Mode</label>
-                    <select id="cfg-23" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>CSS Ellipsis (Single-line)</option><option>Multi-line Frame Allocation</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">24. Layout Alignment Grid</label>
-                    <select id="cfg-24" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>Responsive Fluid Columns</option><option>Fixed Matrix Cells</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">25. Focus State Indicator Color</label>
-                    <select id="cfg-25" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>Dynamic Current Theme Tone</option><option>High Contrast White</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">26. Image Loading Lifecycle</label>
-                    <select id="cfg-26" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>Lazy Defended (Deferred)</option><option>Eager Priority Blast</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">27. Frame Reload Interceptor</label>
-                    <select id="cfg-27" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>Soft Internal Script Refresh</option><option>Hard Base Element Re-render</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">28. Rating Rounding Algorithm</label>
-                    <select id="cfg-28" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>Single Decimal Precision</option><option>Integer Approximation</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">29. App Branding Signature</label>
-                    <select id="cfg-29" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>hylton node</option><option>anonymous nexus</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-mono text-zinc-400 mb-1">30. Hardware Canvas Acceleration</label>
-                    <select id="cfg-30" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 outline-none text-zinc-300">
-                        <option>GPU Composited WebGL</option><option>Standard Software Vector</option>
-                    </select>
                 </div>
             </div>
 
-            <!-- ACTIONS FOOTER -->
-            <div class="flex justify-end gap-2 p-4 border-t border-zinc-800 bg-zinc-900/50">
-                <button onclick="toggleSettingsModal()" class="px-3 py-1.5 font-mono border border-zinc-800 rounded bg-zinc-900 text-zinc-400 hover:text-zinc-200">Cancel</button>
-                <button onclick="toggleSettingsModal()" class="px-4 py-1.5 font-mono bg-zinc-100 text-zinc-950 font-medium hover:bg-zinc-200 rounded transition-colors">Apply Matrix Configurations</button>
+            <div class="flex justify-end p-3 border-t border-zinc-800 bg-zinc-900/50">
+                <button onclick="toggleSettingsModal()" class="px-4 py-1.5 bg-zinc-100 text-zinc-950 font-medium hover:bg-zinc-200 rounded text-xs transition-colors">Save</button>
             </div>
         </div>
     </div>
 
-    <!-- FOOTER SIGNATURE BLOCK -->
-    <footer class="border-t border-zinc-800 bg-zinc-950/40 py-6 text-center text-xs text-zinc-500 font-mono tracking-tight mt-auto">
-        &copy; 2026 hylton &bull; Distributed Streaming Architecture Engine via VidKing.net Core.
+    <!-- FOOTER -->
+    <footer class="border-t border-zinc-800 bg-zinc-950/40 py-4 text-center text-xs text-zinc-500 mt-auto">
+        &copy; 2026 hylton.net
     </footer>
 
-    <!-- CONTROL APPLICATION SCRIPTS ENGINE -->
+    <!-- LOGIC SYSTEM SCRIPT -->
     <script>
         const API_KEY = '3da63f2030991fb208636501d053bf0d';
         const BASE_URL = 'https://api.themoviedb.org/3';
@@ -522,22 +265,17 @@
             loadMediaStream();
             syncDashboardUI();
             
-            // Central Search Query Dispatcher
             const handleSearchQuery = (e) => {
                 activeQueryStr = e.target.value.trim();
-                currentPage = 1; // Reset navigation page pointer
+                currentPage = 1;
                 loadMediaStream();
             };
-
-            document.getElementById('hero-search-input').addEventListener('input', handleSearchQuery);
             document.getElementById('nav-search-input').addEventListener('input', handleSearchQuery);
         });
 
         function initializePreferences() {
             const savedProvider = localStorage.getItem('hylton_preferred_provider') || 'vidkingnet';
             document.getElementById('provider-select').value = savedProvider;
-            document.getElementById('player-inline-provider').value = savedProvider;
-
             const savedTheme = localStorage.getItem('hylton_theme') || 'zinc';
             applyVisualTheme(savedTheme);
         }
@@ -551,25 +289,14 @@
         function toggleSettingsModal() {
             const modal = document.getElementById('settings-modal');
             modal.classList.toggle('hidden');
-            if(!modal.classList.contains('hidden')) {
-                modal.classList.add('flex');
-            } else {
-                modal.classList.remove('flex');
-            }
+            if(!modal.classList.contains('hidden')) modal.classList.add('flex');
+            else modal.classList.remove('flex');
         }
 
         function onProviderChange() {
             const val = document.getElementById('provider-select').value;
             localStorage.setItem('hylton_preferred_provider', val);
-            document.getElementById('player-inline-provider').value = val;
             if (activeId) updatePlayerUrl();
-        }
-
-        function syncInlineProvider() {
-            const val = document.getElementById('player-inline-provider').value;
-            localStorage.setItem('hylton_preferred_provider', val);
-            document.getElementById('provider-select').value = val;
-            updatePlayerUrl();
         }
 
         function switchMediaStream(type) {
@@ -587,49 +314,32 @@
             currentPage += direction;
             if (currentPage < 1) currentPage = 1;
             loadMediaStream();
-            window.scrollTo({ top: 180, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // UNIFIED ASSET CONTEXT LOADING STACK
         async function loadMediaStream() {
             const movieBtn = document.getElementById('toggle-movie');
             const tvBtn = document.getElementById('toggle-tv');
             
-            // Toggle Stream Button UI Matrix state
             if (activeType === 'movie') {
-                movieBtn.className = "px-3 py-1.5 rounded-md font-mono bg-zinc-800 text-zinc-100 font-medium transition-all";
-                tvBtn.className = "px-3 py-1.5 rounded-md font-mono text-zinc-400 hover:text-zinc-200 transition-all";
+                movieBtn.className = "px-3 py-1 rounded-md bg-zinc-800 text-zinc-100 font-medium transition-all";
+                tvBtn.className = "px-3 py-1 rounded-md text-zinc-400 hover:text-zinc-200 transition-all";
             } else {
-                tvBtn.className = "px-3 py-1.5 rounded-md font-mono bg-zinc-800 text-zinc-100 font-medium transition-all";
-                movieBtn.className = "px-3 py-1.5 rounded-md font-mono text-zinc-400 hover:text-zinc-200 transition-all";
+                tvBtn.className = "px-3 py-1 rounded-md bg-zinc-800 text-zinc-100 font-medium transition-all";
+                movieBtn.className = "px-3 py-1 rounded-md text-zinc-400 hover:text-zinc-200 transition-all";
             }
 
-            // Sync indicators
-            document.getElementById('page-indicator').innerText = `Node Page ${String(currentPage).padStart(2, '0')}`;
+            document.getElementById('page-indicator').innerText = `Page ${currentPage}`;
             document.getElementById('btn-prev-page').disabled = (currentPage === 1);
 
             let fetchUrl = '';
-            
-            // Read advanced filter matrices
-            const genreSelect = document.getElementById('hero-genre').value || document.getElementById('search-filter-genre').value;
-            const targetYear = document.getElementById('hero-year').value;
-            const minRating = document.getElementById('hero-rating').value;
+            const genreSelect = document.getElementById('search-filter-genre').value;
 
             if (activeQueryStr.length > 2) {
-                // Query searching vector override
-                document.getElementById('section-title').innerHTML = `<span class="w-1.5 h-3 bg-zinc-400 inline-block"></span>Query Stream: "${activeQueryStr}"`;
                 fetchUrl = `${BASE_URL}/search/${activeType}?api_key=${API_KEY}&query=${encodeURIComponent(activeQueryStr)}&page=${currentPage}`;
             } else {
-                // Standard index vector array
-                document.getElementById('section-title').innerHTML = `<span class="w-1.5 h-3 bg-zinc-400 inline-block"></span>Trending Base: Indexed ${activeType === 'movie' ? 'Cinematics' : 'Series'}`;
-                
-                if (genreSelect || targetYear || minRating) {
-                    fetchUrl = `${BASE_URL}/discover/${activeType}?api_key=${API_KEY}&page=${currentPage}&sort_by=popularity.desc`;
-                    if (genreSelect) fetchUrl += `&with_genres=${genreSelect}`;
-                    if (targetYear) {
-                        fetchUrl += activeType === 'movie' ? `&primary_release_year=${targetYear}` : `&first_air_date_year=${targetYear}`;
-                    }
-                    if (minRating) fetchUrl += `&vote_average.gte=${minRating}`;
+                if (genreSelect) {
+                    fetchUrl = `${BASE_URL}/discover/${activeType}?api_key=${API_KEY}&page=${currentPage}&sort_by=popularity.desc&with_genres=${genreSelect}`;
                 } else {
                     fetchUrl = `${BASE_URL}/trending/${activeType}/week?api_key=${API_KEY}&page=${currentPage}`;
                 }
@@ -640,21 +350,19 @@
                 const data = await res.json();
                 renderGridArray(data.results);
             } catch (err) {
-                console.error("Pipeline breakdown fetching multi-streams: ", err);
+                console.error("Error fetching media: ", err);
             }
         }
 
-        // GRID RE-COMPOSITION WITH INJECTED METADATA & RATINGS TAGS
-        async function renderGridArray(items) {
+        function renderGridArray(items) {
             const grid = document.getElementById('media-grid');
             grid.innerHTML = '';
 
             if (!items || items.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center text-zinc-500 py-16 font-mono text-xs">Zero assets discovered matching parameters.</div>`;
+                grid.innerHTML = `<div class="col-span-full text-center text-zinc-500 py-16 text-sm">No results found matching variables.</div>`;
                 return;
             }
 
-            // Map genre index records to readable tokens
             const genreMap = {
                 28: 'Action', 12: 'Adventure', 16: 'Animation', 35: 'Comedy', 80: 'Crime',
                 99: 'Doc', 18: 'Drama', 10751: 'Family', 14: 'Fantasy', 36: 'History',
@@ -667,37 +375,27 @@
                 const year = (item.release_date || item.first_air_date || '').split('-')[0] || 'N/A';
                 const poster = item.poster_path ? `${IMAGE_URL}${item.poster_path}` : 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=342&auto=format&fit=crop';
                 const rating = item.vote_average ? item.vote_average.toFixed(1) : '0.0';
-                
-                // Parse primary genre tag
                 const primaryGenre = item.genre_ids && item.genre_ids.length > 0 ? genreMap[item.genre_ids[0]] || 'Drama' : 'Media';
 
                 const card = document.createElement('div');
-                card.className = "group cursor-pointer space-y-1.5 relative bg-zinc-950/40 p-1 rounded-lg border border-transparent hover:border-zinc-800 transition-all duration-150";
+                card.className = "group cursor-pointer space-y-1.5 relative";
                 card.onclick = () => launchImmersivePlayer(activeType, item.id, title);
 
                 card.innerHTML = `
-                    <div class="aspect-[2/3] w-full overflow-hidden rounded-md bg-zinc-900 border border-zinc-800/80 transition-colors group-hover:border-zinc-700 relative shadow-md">
-                        <img src="${poster}" alt="${title}" class="w-full h-full object-cover transition-transform duration-200 group-hover:scale-102" loading="lazy">
-                        
-                        <!-- HUD Overlay Badges (Mobile and Desktop Friendly) -->
+                    <div class="aspect-[2/3] w-full overflow-hidden rounded-md bg-zinc-900 border border-zinc-800 transition-colors group-hover:border-zinc-700 relative shadow-md">
+                        <img src="${poster}" alt="${title}" class="w-full h-full object-cover" loading="lazy">
                         <div class="absolute top-2 left-2 flex flex-col gap-1 z-10">
-                            <span class="bg-zinc-950/90 text-zinc-100 text-[9px] font-mono font-bold tracking-tight px-1.5 py-0.5 rounded border border-zinc-800">${primaryGenre}</span>
+                            <span class="bg-zinc-950/90 text-zinc-300 text-[10px] px-1.5 py-0.5 rounded border border-zinc-800">${primaryGenre}</span>
                         </div>
                         <div class="absolute top-2 right-2 z-10">
-                            <span class="bg-amber-500 text-zinc-950 font-mono font-bold text-[9px] px-1.5 py-0.5 rounded shadow flex items-center gap-0.5">&★; ${rating}</span>
-                        </div>
-
-                        <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
-                            <div class="bg-zinc-950/90 p-2.5 rounded-lg border border-zinc-700 text-zinc-100 text-[10px] font-mono tracking-tight text-center">
-                                Parse Stream Pipeline
-                            </div>
+                            <span class="bg-zinc-950/90 text-amber-400 font-bold text-[10px] px-1.5 py-0.5 rounded border border-zinc-800">★ ${rating}</span>
                         </div>
                     </div>
-                    <div class="space-y-0.5 px-1">
-                        <h3 class="text-xs font-semibold text-zinc-300 line-clamp-1 group-hover:text-zinc-100 transition-colors tracking-tight font-mono">${title}</h3>
-                        <div class="flex items-center justify-between text-[10px] text-zinc-500 font-mono">
+                    <div class="space-y-0.5">
+                        <h3 class="text-sm font-medium text-zinc-200 line-clamp-1 group-hover:text-zinc-100 transition-colors">${title}</h3>
+                        <div class="flex items-center justify-between text-xs text-zinc-500">
                             <span>${year}</span>
-                            <span class="uppercase tracking-widest text-[9px] text-zinc-400">${activeType}</span>
+                            <span class="capitalize text-[11px]">${activeType}</span>
                         </div>
                     </div>
                 `;
@@ -705,7 +403,6 @@
             });
         }
 
-        // FULL METADATA ACQUISITION LAYER
         async function launchImmersivePlayer(type, id, title) {
             activeType = type;
             activeId = id;
@@ -713,34 +410,37 @@
             activeSeason = 1;
             activeEpisode = 1;
             
-            // Layout View Switcher Node
             document.getElementById('home-view').classList.add('hidden');
             document.getElementById('player-view').classList.remove('hidden');
-            document.getElementById('nav-search-container').classList.remove('hidden');
-            document.getElementById('ai-response-block').innerText = "Ready to generate predictive context blueprints for this asset. Click compute to parse narrative vector.";
+            
+            // Clear prior chat outputs
+            document.getElementById('chat-messages').innerHTML = `
+                <div class="flex gap-2 items-start max-w-[85%]">
+                    <div class="bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-zinc-300">
+                        Don't understand something about <strong>${title}</strong>? Ask me anything about the plot, characters, lore, or confusion!
+                    </div>
+                </div>
+            `;
             
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
-            // Initialize API Meta Registry Query
             try {
                 const detailsRes = await fetch(`${BASE_URL}/${type}/${id}?api_key=${API_KEY}&append_to_response=credits`);
                 const details = await detailsRes.json();
                 
-                // Inject fields to metadata panel
                 document.getElementById('meta-title').innerText = details.title || details.name;
-                document.getElementById('meta-overview').innerText = details.overview || "No registered thematic summary catalogued in TMDB nodes.";
+                document.getElementById('meta-overview').innerText = details.overview || "No text blueprint logged for this project.";
                 document.getElementById('meta-year').innerText = (details.release_date || details.first_air_date || 'N/A').split('-')[0];
                 document.getElementById('meta-rating').innerText = `★ ${details.vote_average ? details.vote_average.toFixed(1) : '0.0'}`;
                 
                 const genresParsed = details.genres ? details.genres.map(g => g.name).join(', ') : 'General Asset';
                 document.getElementById('meta-genres').innerText = genresParsed;
 
-                // Handle Cast lists safely
                 if (details.credits && details.credits.cast) {
                     const actors = details.credits.cast.slice(0, 5).map(c => c.name).join(', ');
-                    document.getElementById('meta-cast').innerText = actors || "Unknown Actors Matrix";
+                    document.getElementById('meta-cast').innerText = actors || "Unknown Cast Array";
                 } else {
-                    document.getElementById('meta-cast').innerText = "Data missing in cast protocol arrays.";
+                    document.getElementById('meta-cast').innerText = "Unknown Cast Array";
                 }
 
                 if (type === 'tv') {
@@ -753,7 +453,7 @@
                     for (let i = 1; i <= details.number_of_seasons; i++) {
                         const opt = document.createElement('option');
                         opt.value = i;
-                        opt.innerText = `Season ${String(i).padStart(2, '0')}`;
+                        opt.innerText = `Season ${i}`;
                         if(i === activeSeason) opt.selected = true;
                         selector.appendChild(opt);
                     }
@@ -764,7 +464,7 @@
                     recordWatchHistory();
                 }
             } catch (err) {
-                console.error("Fault inside metadata core compilation: ", err);
+                console.error("Error setting up player interface: ", err);
                 updatePlayerUrl(); 
             }
         }
@@ -778,11 +478,11 @@
 
                 data.episodes.forEach(ep => {
                     const btn = document.createElement('button');
-                    btn.innerText = String(ep.episode_number).padStart(2, '0');
-                    btn.className = `h-8 text-xs font-mono rounded border transition-all ${
+                    btn.innerText = ep.episode_number;
+                    btn.className = `h-8 text-xs rounded border transition-all ${
                         ep.episode_number === activeEpisode 
                         ? 'bg-zinc-100 border-zinc-100 text-zinc-950 font-bold shadow' 
-                        : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-500 hover:text-zinc-100'
+                        : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-zinc-100'
                     }`;
                     btn.onclick = () => {
                         activeSeason = seasonNum;
@@ -815,7 +515,6 @@
         }
 
         function getEmbedUrl(provider, type, id, s = 1, e = 1) {
-            // ALWAYS map and direct default routing parameters straight into VidKing.net platform structures.
             switch(provider) {
                 case 'vidkingnet':
                     return type === 'movie' ? `https://vidking.net/embed/movie/${id}` : `https://vidking.net/embed/tv/${id}/${s}/${e}`;
@@ -827,25 +526,35 @@
                     return type === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}`;
                 case 'embedsu':
                     return type === 'movie' ? `https://embed.su/embed/movie/${id}` : `https://embed.su/embed/tv/${id}/${s}/${e}`;
-                case 'autoembed':
-                    return type === 'movie' ? `https://player.autoembed.to/movie/${id}` : `https://player.autoembed.to/tv/${id}/${s}/${e}`;
                 default:
                     return type === 'movie' ? `https://vidking.net/embed/movie/${id}` : `https://vidking.net/embed/tv/${id}/${s}/${e}`;
             }
         }
 
-        // INTEGRATED GEMINI ADVANCED ANALYTICS INTERFACE (PROMPT INJECTOR CHIP)
-        async function triggerGeminiQuery() {
-            const responseBox = document.getElementById('ai-response-block');
+        // DYNAMIC SHADCN INLINE CHATBOX INTERACTION WITH GEMINI
+        async function handleChatSubmit(event) {
+            event.preventDefault();
+            const inputEl = document.getElementById('chat-input');
+            const question = inputEl.value.trim();
+            if (!question) return;
+
+            inputEl.value = '';
+            appendChatMessage(question, true);
+
+            const chatMessages = document.getElementById('chat-messages');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = "flex gap-2 items-start max-w-[85%] animate-pulse text-zinc-500";
+            loadingDiv.innerText = "Thinking...";
+            chatMessages.appendChild(loadingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
             const summaryText = document.getElementById('meta-overview').innerText;
             const castText = document.getElementById('meta-cast').innerText;
-
-            responseBox.innerText = "Connecting to Gemini intelligence node over API channels... Computing logical narrative matrix...";
 
             const promptPayload = {
                 contents: [{
                     parts: [{
-                        text: `Provide a highly analytical, 3-sentence thematic breakdown, hidden easter eggs, or narrative implications for the movie or show entitled "${activeTitle}". Summary context: ${summaryText}. Cast array: ${castText}. Output format must be pure concise text, tone professional yet futuristic.`
+                        text: `The user is watching "${activeTitle}". Overview context: ${summaryText}. Cast array: ${castText}. The user has a direct question about this media or doesn't understand something: "${question}". Answer their question accurately, clearly, and concisely in 1-3 simple sentences. Use normal prose text format.`
                     }]
                 }]
             };
@@ -858,24 +567,48 @@
                 });
                 const data = await response.json();
                 
+                loadingDiv.remove();
+
                 if (data.candidates && data.candidates[0].content.parts[0].text) {
-                    responseBox.innerText = data.candidates[0].content.parts[0].text;
+                    appendChatMessage(data.candidates[0].content.parts[0].text, false);
                 } else {
-                    responseBox.innerText = "Intelligence pipeline failed to return validated structural context branches.";
+                    appendChatMessage("Sorry, I could not process that query. Please try again.", false);
                 }
             } catch (err) {
-                responseBox.innerText = "Error establishing upstream Gemini pipeline handshake. Confirm API Key allocations.";
+                loadingDiv.remove();
+                appendChatMessage("Error reaching AI companion. Check your connectivity status.", false);
                 console.error(err);
             }
+        }
+
+        function appendChatMessage(text, isUser) {
+            const container = document.getElementById('chat-messages');
+            const msgWrapper = document.createElement('div');
+            
+            if (isUser) {
+                msgWrapper.className = "flex justify-end w-full";
+                msgWrapper.innerHTML = `
+                    <div class="bg-zinc-100 text-zinc-950 rounded-lg p-2 max-w-[85%] break-words">
+                        ${text}
+                    </div>
+                `;
+            } else {
+                msgWrapper.className = "flex gap-2 items-start max-w-[85%]";
+                msgWrapper.innerHTML = `
+                    <div class="bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-zinc-300 break-words">
+                        ${text}
+                    </div>
+                `;
+            }
+            container.appendChild(msgWrapper);
+            container.scrollTop = container.scrollHeight;
         }
 
         function showHome(e) {
             if (e) e.preventDefault();
             document.getElementById('video-iframe').src = ""; 
             document.getElementById('player-view').classList.add('hidden');
-            document.getElementById('nav-search-container').classList.add('hidden');
             document.getElementById('home-view').classList.remove('hidden');
-            document.getElementById('hero-search-input').value = "";
             document.getElementById('nav-search-input').value = "";
             activeId = '';
             syncDashboardUI();
@@ -891,17 +624,17 @@
                 panel.classList.remove('hidden');
                 historyContainer.innerHTML = '';
                 
-                [...localHistory].reverse().forEach(record => {
+                [...localHistory].reverse().slice(0, 4).forEach(record => {
                     const cell = document.createElement('div');
-                    cell.className = "flex items-center justify-between text-[11px] bg-zinc-900/90 hover:bg-zinc-900 border border-zinc-800 rounded px-2.5 py-1.5 cursor-pointer group font-mono";
+                    cell.className = "flex items-center justify-between text-xs bg-zinc-900 hover:bg-zinc-800/80 border border-zinc-800 rounded p-2 cursor-pointer group";
                     
-                    let label = `<span class="text-[9px] uppercase border border-zinc-800 bg-zinc-950 px-1 rounded text-zinc-500">Movie</span>`;
+                    let label = `<span class="text-[10px] bg-zinc-950 px-1 rounded text-zinc-500">Movie</span>`;
                     if(record.type === 'tv') {
-                        label = `<span class="text-[9px] uppercase border border-zinc-700 bg-zinc-900 px-1 rounded text-zinc-200">S${record.season} E${record.episode}</span>`;
+                        label = `<span class="text-[10px] bg-zinc-950 px-1 rounded text-zinc-300">S${record.season} E${record.episode}</span>`;
                     }
 
                     cell.innerHTML = `
-                        <span class="font-medium text-zinc-400 group-hover:text-white line-clamp-1 truncate max-w-[140px]">${record.title}</span>
+                        <span class="font-medium text-zinc-300 group-hover:text-white truncate max-w-[120px]">${record.title}</span>
                         ${label}
                     `;
                     cell.onclick = () => {
@@ -945,18 +678,8 @@
         }
 
         function clearDeviceHistory() {
-            if(confirm("Confirm destructive purge of all local client buffer markers?")) {
-                localStorage.removeItem('hylton_local_history');
-                syncDashboardUI();
-            }
-        }
-
-        function adjustCinematicLight() {
-            alert("Cinematic lighting protocol applied. Backdrop matrices scaled down.");
-        }
-
-        function reloadActiveNode() {
-            updatePlayerUrl();
+            localStorage.removeItem('hylton_local_history');
+            syncDashboardUI();
         }
     </script>
 </body>
