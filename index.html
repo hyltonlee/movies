@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hylton</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Aileron', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Aileron', 'Helvetica Neue', Arial, sans-serif;
+            background-color: #09090b;
+            color: #fafafa;
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #09090b; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-zinc-800 selection:text-zinc-100">
+
+    <header class="border-b border-zinc-800 bg-zinc-950/50 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+            <a href="#" onclick="showHome(event)" class="text-sm font-medium tracking-tight text-zinc-400 hover:text-zinc-100 transition-colors shrink-0">made by hylton</a>
+            
+            <div id="nav-search-container" class="hidden w-full max-w-sm mx-auto">
+                <div class="relative">
+                    <input type="text" id="nav-search-input" placeholder="Search movies or TV shows..." 
+                        class="w-full h-9 bg-zinc-900 border border-zinc-800 rounded-md pl-9 pr-4 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400">
+                    <div class="absolute left-3 top-2.5 text-zinc-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 shrink-0">
+                <div id="header-provider-container" class="flex items-center gap-2">
+                    <select id="provider-select" onchange="updatePlayerUrl()" 
+                        class="bg-zinc-900 border border-zinc-800 rounded px-2 py-1 text-xs text-zinc-300 focus:outline-none focus:border-zinc-500 cursor-pointer">
+                        <option value="vidlink">VidLink.pro</option>
+                        <option value="vidkingnet">VidKing.net</option>
+                        <option value="vidsrccc">VidSrc.cc</option>
+                        <option value="vidsrcto">VidSrc.to</option>
+                        <option value="vidsrcme">VidSrc.me</option>
+                        <option value="autoembed">AutoEmbed</option>
+                        <option value="twoembed">2Embed</option>
+                        <option value="vidking">Vidking</option>
+                        <option value="smashy">Smashy Stream</option>
+                        <option value="embedsu">Embed.su</option>
+                        <option value="moviesapi">MoviesAPI</option>
+                        <option value="superembed">SuperEmbed</option>
+                        <option value="novera">Novera</option>
+                        <option value="rivestream">RiveStream</option>
+                        <option value="vidsrcpro">Vidsrc.pro</option>
+                        <option value="cinepro">Cinepro Core</option>
+                        <option value="movieweb">Movie-Web Providers</option>
+                        <option value="fsapi">FSAPI</option>
+                        <option value="gomo">Gomo</option>
+                        <option value="curtstream">CurtStream</option>
+                        <option value="moviewp">MovieWP</option>
+                        <option value="apimdb">Apimdb</option>
+                        <option value="vidcloud">Vidcloud</option>
+                        <option value="streamnova">Streamnova</option>
+                        <option value="cinematrixx">Cinematrixx</option>
+                        <option value="reelverse">Reelverse</option>
+                        <option value="flixora">Flixora</option>
+                        <option value="novaprime">NovaPrimeFilms</option>
+                        <option value="cinehorizon">CineHorizon</option>
+                        <option value="velostreams">Velostreams</option>
+                        <option value="filmorahub">FilmoraHub</option>
+                        <option value="epicscreen">EpicScreen</option>
+                        <option value="cineluxe">CineLuxe</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-8">
+        
+        <section id="home-view" class="space-y-12 my-6">
+            <div id="tracker-dashboard-panel" class="max-w-xl mx-auto bg-zinc-950 border border-zinc-800 rounded-lg p-5 shadow-xl space-y-4 hidden">
+                <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                    <div>
+                        <h3 class="text-sm font-semibold tracking-tight text-zinc-200">Continue Watching</h3>
+                        <p class="text-[11px] text-zinc-500 font-sans mt-0.5">Your recently watched items saved on this device.</p>
+                    </div>
+                    <div>
+                        <button onclick="clearDeviceHistory()" class="text-[11px] text-zinc-400 hover:text-zinc-200 border border-zinc-800 px-2 py-0.5 rounded bg-zinc-900 transition-colors">Clear All</button>
+                    </div>
+                </div>
+                <div id="panel-history-container" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
+            </div>
+
+            <div class="text-center max-w-lg mx-auto space-y-2 pt-4">
+                <h1 class="text-2xl font-semibold tracking-tight text-zinc-100">What are we watching today?</h1>
+                <div class="relative">
+                    <input type="text" id="hero-search-input" placeholder="Search titles..." 
+                        class="w-full h-11 bg-zinc-900 border border-zinc-800 rounded-md pl-10 pr-4 text-base text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 shadow-xl">
+                    <div class="absolute left-3.5 top-[14px] text-zinc-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6 pt-2">
+                <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
+                    <h2 id="section-title" class="text-lg font-medium tracking-tight">Trending Now</h2>
+                    <div class="flex gap-2 text-xs">
+                        <button onclick="fetchTrending('movie')" id="toggle-movie" class="px-3 py-1 rounded bg-zinc-800 text-zinc-100 font-medium">Movies</button>
+                        <button onclick="fetchTrending('tv')" id="toggle-tv" class="px-3 py-1 rounded text-zinc-400 hover:text-zinc-100/85">TV Shows</button>
+                    </div>
+                </div>
+                <div id="media-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+            </div>
+        </section>
+
+        <section id="player-view" class="hidden space-y-6">
+            <button onclick="showHome()" class="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-100">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                Back to exploration
+            </button>
+
+            <div class="bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden shadow-2xl">
+                <div class="relative w-full aspect-video bg-black">
+                    <iframe id="video-iframe" src="" allowfullscreen class="absolute inset-0 w-full h-full border-0" allow="autoplay; encrypted-media; picture-in-picture"></iframe>
+                </div>
+            </div>
+
+            <div id="tv-controls" class="hidden bg-zinc-950 border border-zinc-800 rounded-lg p-4 space-y-4">
+                <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
+                    <h4 class="text-sm font-medium tracking-tight">Navigation Matrix</h4>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-zinc-400">Season:</span>
+                        <select id="season-select" onchange="onSeasonChange()" class="bg-zinc-900 border border-zinc-800 rounded px-2 py-0.5 text-xs text-zinc-300 focus:outline-none">
+                        </select>
+                    </div>
+                </div>
+                <div id="episode-grid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-2"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="border-t border-zinc-800 bg-zinc-950/20 py-6 text-center text-xs text-zinc-600 mt-auto">
+        &copy; 2026 hylton.
+    </footer>
+
+    <script>
+        const API_KEY = '3da63f2030991fb208636501d053bf0d';
+        const BASE_URL = 'https://api.themoviedb.org/3';
+        const IMAGE_URL = 'https://image.tmdb.org/t/p/w342';
+
+        let activeType = 'movie'; 
+        let activeId = '';
+        let activeTitle = '';
+        let activeSeason = 1;
+        let activeEpisode = 1;
+
+        function getEmbedUrl(provider, type, id, s = 1, e = 1) {
+            switch(provider) {
+                case 'vidlink':
+                    return type === 'movie' ? `https://vidlink.pro/movie/${id}` : `https://vidlink.pro/tv/${id}/${s}/${e}`;
+                case 'vidkingnet':
+                    return type === 'movie' ? `https://vidking.net/embed/movie/${id}` : `https://vidking.net/embed/tv/${id}/${s}/${e}`;
+                case 'vidsrcto':
+                    return type === 'movie' ? `https://vidsrc.to/embed/movie/${id}` : `https://vidsrc.to/embed/tv/${id}/${s}/${e}`;
+                case 'vidsrccc':
+                    return type === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}`;
+                case 'vidsrcme':
+                    return type === 'movie' ? `https://vidsrc.me/embed/movie?tmdb=${id}` : `https://vidsrc.me/embed/tv?tmdb=${id}&sea=${s}&epi=${e}`;
+                case 'autoembed':
+                    return type === 'movie' ? `https://player.autoembed.to/movie/${id}` : `https://player.autoembed.to/tv/${id}/${s}/${e}`;
+                case 'twoembed':
+                    return type === 'movie' ? `https://www.2embed.cc/embed/${id}` : `https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}`;
+                case 'embedsu':
+                    return type === 'movie' ? `https://embed.su/embed/movie/${id}` : `https://embed.su/embed/tv/${id}/${s}/${e}`;
+                case 'vidsrcpro':
+                    return type === 'movie' ? `https://vidsrc.pro/embed/movie/${id}` : `https://vidsrc.pro/embed/tv/${id}/${s}/${e}`;
+                case 'rivestream':
+                    return type === 'movie' ? `https://api.rivestream.xyz/embed/movie?tmdb=${id}` : `https://api.rivestream.xyz/embed/tv?tmdb=${id}&season=${s}&episode=${e}`;
+                case 'smashy':
+                    return type === 'movie' ? `https://embed.smashystream.com/playere.php?tmdb=${id}` : `https://embed.smashystream.com/playere.php?tmdb=${id}&season=${s}&episode=${e}`;
+                case 'moviesapi':
+                    return type === 'movie' ? `https://moviesapi.club/movie/${id}` : `https://moviesapi.club/tv/${id}-${s}-${e}`;
+                case 'superembed':
+                    return type === 'movie' ? `https://multiembed.mov/?video_id=${id}&tmdb=1` : `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}`;
+                case 'vidking':   return `https://vidking.link/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`;
+                case 'novera':    return `https://player.novera.website/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`;
+                case 'cinepro':   return `https://cinepro.org/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`;
+                case 'movieweb':  return `https://backend.movie-web.app/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`;
+                case 'fsapi':     return `https://vidsrc.xyz/embed/movie/${id}`; 
+                case 'gomo':      return `https://gomoplayer.com/movie/${id}`;
+                case 'curtstream':return `https://curtstream.xyz/embed/${type}/${id}`;
+                case 'moviewp':   return `https://moviewp.xyz/embed/${type}/${id}`;
+                case 'apimdb':    return `https://api.imdbapi.xyz/embed/${type}/${id}`;
+                case 'vidcloud':  return `https://vidcloud.stream/embed/${type}/${id}`;
+                case 'streamnova':return `https://streamnova.xyz/embed/${type}/${id}`;
+                case 'cinematrixx':return `https://cinematrixx.lol/embed/${type}/${id}`;
+                case 'reelverse': return `https://reelverse.biz/embed/${type}/${id}`;
+                case 'flixora':   return `https://flixora.com/embed/${type}/${id}`;
+                case 'novaprime': return `https://novaprime.films/embed/${type}/${id}`;
+                case 'cinehorizon':return `https://cinehorizon.net/embed/${type}/${id}`;
+                case 'velostreams':return `https://velostreams.com/embed/${type}/${id}`;
+                case 'filmorahub': return `https://filmorahub.xyz/embed/${type}/${id}`;
+                case 'epicscreen': return `https://epicscreen.live/embed/${type}/${id}`;
+                case 'cineluxe':   return `https://cineluxe.club/embed/${type}/${id}`;
+                default:
+                    return type === 'movie' ? `https://vidlink.pro/movie/${id}` : `https://vidlink.pro/tv/${id}/${s}/${e}`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchTrending('movie');
+            syncDashboardUI();
+            
+            const handleSearch = async (e) => {
+                const query = e.target.value.trim();
+                if (query.length > 2) {
+                    try {
+                        const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
+                        const data = await res.json();
+                        const filtered = data.results.filter(i => i.media_type === 'movie' || i.media_type === 'tv');
+                        document.getElementById('section-title').innerText = `Search results for: "${query}"`;
+                        renderGrid(filtered, null);
+                    } catch (err) {
+                        console.error(err);
+                    }
+                } else if (query.length === 0) {
+                    fetchTrending(activeType);
+                }
+            };
+
+            document.getElementById('hero-search-input').addEventListener('input', handleSearch);
+            document.getElementById('nav-search-input').addEventListener('input', handleSearch);
+        });
+
+        async function fetchTrending(type) {
+            activeType = type;
+            const movieBtn = document.getElementById('toggle-movie');
+            const tvBtn = document.getElementById('toggle-tv');
+            
+            if (type === 'movie') {
+                movieBtn.className = "px-3 py-1 rounded bg-zinc-800 text-zinc-100 font-medium";
+                tvBtn.className = "px-3 py-1 rounded text-zinc-400 hover:text-zinc-100";
+                document.getElementById('section-title').innerText = "Trending Movies";
+            } else {
+                tvBtn.className = "px-3 py-1 rounded bg-zinc-800 text-zinc-100 font-medium";
+                movieBtn.className = "px-3 py-1 rounded text-zinc-400 hover:text-zinc-100";
+                document.getElementById('section-title').innerText = "Trending TV Series";
+            }
+
+            try {
+                const res = await fetch(`${BASE_URL}/trending/${type}/week?api_key=${API_KEY}`);
+                const data = await res.json();
+                renderGrid(data.results, type);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function renderGrid(items, forceType) {
+            const grid = document.getElementById('media-grid');
+            grid.innerHTML = '';
+
+            if (!items || items.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center text-zinc-500 py-12 text-sm">No results found.</div>`;
+                return;
+            }
+
+            items.forEach(item => {
+                const type = forceType || item.media_type;
+                const title = item.title || item.name;
+                const year = (item.release_date || item.first_air_date || '').split('-')[0] || 'N/A';
+                const poster = item.poster_path ? `${IMAGE_URL}${item.poster_path}` : 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?q=80&w=342&auto=format&fit=crop';
+
+                const card = document.createElement('div');
+                card.className = "group cursor-pointer space-y-2 relative";
+                card.onclick = () => launchPlayer(type, item.id, title);
+
+                card.innerHTML = `
+                    <div class="aspect-[2/3] w-full overflow-hidden rounded-md bg-zinc-900 border border-zinc-800 transition-colors group-hover:border-zinc-700 relative">
+                        <img src="${poster}" alt="${title}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center">
+                            <div class="bg-zinc-950/80 p-3 rounded-full border border-zinc-700 text-zinc-100 transform scale-90 group-hover:scale-100 transition-transform">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-0.5 px-1">
+                        <h3 class="text-xs font-medium text-zinc-200 line-clamp-1 group-hover:text-white transition-colors tracking-tight">${title}</h3>
+                        <div class="flex items-center justify-between text-[10px] text-zinc-500 font-mono">
+                            <span>${year}</span>
+                            <span class="uppercase border border-zinc-800 px-1 rounded bg-zinc-900">${type}</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        async function launchPlayer(type, id, title = '') {
+            activeType = type;
+            activeId = id;
+            activeTitle = title || `Asset Vector ${id}`;
+            activeSeason = 1;
+            activeEpisode = 1;
+            
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('player-view').classList.remove('hidden');
+            document.getElementById('nav-search-container').classList.remove('hidden');
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (type === 'tv') {
+                document.getElementById('tv-controls').classList.remove('hidden');
+                try {
+                    const res = await fetch(`${BASE_URL}/tv/${id}?api_key=${API_KEY}`);
+                    const data = await res.json();
+                    activeTitle = data.name;
+                    
+                    retrieveSavedProgressMarker();
+
+                    const selector = document.getElementById('season-select');
+                    selector.innerHTML = '';
+                    
+                    for (let i = 1; i <= data.number_of_seasons; i++) {
+                        const opt = document.createElement('option');
+                        opt.value = i;
+                        opt.innerText = `Season ${i}`;
+                        if(i === activeSeason) opt.selected = true;
+                        selector.appendChild(opt);
+                    }
+                    await buildEpisodeGrid(id, activeSeason);
+                } catch(err) {
+                    console.error(err);
+                }
+            } else {
+                document.getElementById('tv-controls').classList.add('hidden');
+                updatePlayerUrl();
+                recordWatchHistory();
+            }
+        }
+
+        async function buildEpisodeGrid(id, seasonNum) {
+            try {
+                const res = await fetch(`${BASE_URL}/tv/${id}/season/${seasonNum}?api_key=${API_KEY}`);
+                const data = await res.json();
+                const grid = document.getElementById('episode-grid');
+                grid.innerHTML = '';
+
+                data.episodes.forEach(ep => {
+                    const btn = document.createElement('button');
+                    btn.innerText = ep.episode_number;
+                    btn.className = `h-8 text-xs font-mono rounded border transition-all ${
+                        ep.episode_number === activeEpisode 
+                        ? 'bg-zinc-100 border-zinc-100 text-zinc-950 font-bold' 
+                        : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-zinc-100'
+                    }`;
+                    btn.onclick = () => {
+                        activeSeason = seasonNum;
+                        activeEpisode = ep.episode_number;
+                        buildEpisodeGrid(activeId, activeSeason);
+                        recordWatchHistory();
+                    };
+                    grid.appendChild(btn);
+                });
+
+                updatePlayerUrl();
+            } catch(err) {
+                console.error(err);
+            }
+        }
+
+        function onSeasonChange() {
+            activeSeason = parseInt(document.getElementById('season-select').value);
+            activeEpisode = 1; 
+            buildEpisodeGrid(activeId, activeSeason);
+        }
+
+        function updatePlayerUrl() {
+            const provider = document.getElementById('provider-select').value;
+            const target = getEmbedUrl(provider, activeType, activeId, activeSeason, activeEpisode);
+            const iframe = document.getElementById('video-iframe');
+            if (iframe.src !== target) {
+                iframe.src = target;
+            }
+        }
+
+        function showHome(e) {
+            if (e) e.preventDefault();
+            document.getElementById('video-iframe').src = ""; 
+            document.getElementById('player-view').classList.add('hidden');
+            document.getElementById('nav-search-container').classList.add('hidden');
+            document.getElementById('home-view').classList.remove('hidden');
+            document.getElementById('hero-search-input').value = "";
+            document.getElementById('nav-search-input').value = "";
+            syncDashboardUI();
+            fetchTrending(activeType);
+        }
+
+        function syncDashboardUI() {
+            const panel = document.getElementById('tracker-dashboard-panel');
+            const historyContainer = document.getElementById('panel-history-container');
+            const localHistory = JSON.parse(localStorage.getItem('hylton_local_history')) || [];
+
+            if(localHistory.length > 0) {
+                panel.classList.remove('hidden');
+                historyContainer.innerHTML = '';
+                
+                [...localHistory].reverse().forEach(record => {
+                    const cell = document.createElement('div');
+                    cell.className = "flex items-center justify-between text-xs bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-800 rounded px-3 py-2 transition-colors cursor-pointer group";
+                    
+                    let runtimeLabel = `<span class="text-[10px] uppercase font-mono tracking-wider border border-zinc-800 bg-zinc-950 px-1.5 rounded py-0.5 text-zinc-400 group-hover:text-zinc-200">Movie</span>`;
+                    if(record.type === 'tv') {
+                        runtimeLabel = `<span class="text-[10px] uppercase font-mono tracking-wider border border-zinc-700 bg-zinc-900 px-1.5 rounded py-0.5 text-zinc-100 font-bold">S${record.season} E${record.episode}</span>`;
+                    }
+
+                    cell.innerHTML = `
+                        <div class="flex flex-col max-w-[70%]">
+                            <span class="font-medium text-zinc-300 group-hover:text-white line-clamp-1 truncate">${record.title}</span>
+                            <span class="text-[9px] font-mono text-zinc-600 mt-0.5">${new Date(record.timestamp).toLocaleDateString()}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            ${runtimeLabel}
+                        </div>
+                    `;
+                    cell.onclick = (e) => {
+                        e.stopPropagation();
+                        resumePlaybackFromRecord(record);
+                    };
+                    historyContainer.appendChild(cell);
+                });
+            } else {
+                panel.classList.add('hidden');
+                historyContainer.innerHTML = '';
+            }
+        }
+
+        function recordWatchHistory() {
+            let localHistory = JSON.parse(localStorage.getItem('hylton_local_history')) || [];
+            localHistory = localHistory.filter(item => item.id !== activeId.toString());
+
+            const historyItem = {
+                id: activeId.toString(),
+                type: activeType,
+                title: activeTitle,
+                season: activeSeason,
+                episode: activeEpisode,
+                timestamp: Date.now()
+            };
+
+            localHistory.push(historyItem);
+            localStorage.setItem('hylton_local_history', JSON.stringify(localHistory));
+        }
+
+        function retrieveSavedProgressMarker() {
+            const localHistory = JSON.parse(localStorage.getItem('hylton_local_history')) || [];
+            const matchingRecord = localHistory.find(item => item.id === activeId.toString() && item.type === 'tv');
+            
+            if(matchingRecord) {
+                activeSeason = parseInt(matchingRecord.season) || 1;
+                activeEpisode = parseInt(matchingRecord.episode) || 1;
+            }
+        }
+
+        function resumePlaybackFromRecord(record) {
+            launchPlayer(record.type, record.id, record.title);
+            if(record.type === 'tv') {
+                activeSeason = parseInt(record.season);
+                activeEpisode = parseInt(record.episode);
+                const selector = document.getElementById('season-select');
+                if(selector) selector.value = activeSeason;
+                buildEpisodeGrid(record.id, activeSeason);
+            }
+        }
+
+        function clearDeviceHistory() {
+            if(confirm("Clear your watch history from this device?")) {
+                localStorage.removeItem('hylton_local_history');
+                syncDashboardUI();
+            }
+        }
+    </script>
+</body>
+</html>
