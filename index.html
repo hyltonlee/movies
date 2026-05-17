@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>hylton - Stream Movies & TV Shows</title>
+    <title>hylton - Ultimate Streaming Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -33,15 +33,9 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
-        .modal-description {
-            display: -webkit-box;
-            -webkit-line-clamp: 6;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
         @keyframes slideUp {
             from { transform: translateY(20px); opacity: 0; }
@@ -49,6 +43,13 @@
         }
         .animate-fadeIn { animation: fadeIn 0.2s ease-out; }
         .animate-slideUp { animation: slideUp 0.3s ease-out; }
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            animation: slideUp 0.3s ease-out;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-zinc-800 selection:text-zinc-100">
@@ -62,12 +63,20 @@
                     <input type="text" id="nav-search-input" placeholder="Search movies or TV shows..." 
                         class="w-full h-9 bg-zinc-900 border border-zinc-800 rounded-md pl-9 pr-4 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400">
                     <div class="absolute left-3 top-2.5 text-zinc-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                     </div>
                 </div>
             </div>
 
             <div class="flex items-center gap-4 shrink-0">
+                <button onclick="showWatchlist()" class="text-zinc-400 hover:text-zinc-100 transition-colors relative group" title="Watchlist">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M20 21v-2a4 4 0 0 0-3-3.85"/></svg>
+                    <span id="watchlist-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
+                </button>
+                <button onclick="showFavorites()" class="text-zinc-400 hover:text-red-500 transition-colors relative group" title="Favorites">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                    <span id="favorites-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
+                </button>
                 <div id="header-provider-container" class="flex items-center gap-2">
                     <select id="provider-select" onchange="onProviderChange()" 
                         class="bg-zinc-900 border border-zinc-800 rounded px-2 py-1 text-xs text-zinc-300 focus:outline-none focus:border-zinc-500 cursor-pointer">
@@ -80,33 +89,11 @@
                         <option value="twoembed">2Embed</option>
                         <option value="smashy">Smashy Stream</option>
                         <option value="embedsu">Embed.su</option>
-                        <option value="moviesapi">MoviesAPI</option>
                         <option value="superembed">SuperEmbed</option>
-                        <option value="novera">Novera</option>
-                        <option value="rivestream">RiveStream</option>
-                        <option value="vidsrcpro">Vidsrc.pro</option>
-                        <option value="cinepro">Cinepro Core</option>
-                        <option value="movieweb">Movie-Web Providers</option>
-                        <option value="fsapi">FSAPI</option>
-                        <option value="gomo">Gomo</option>
-                        <option value="curtstream">CurtStream</option>
-                        <option value="moviewp">MovieWP</option>
-                        <option value="apimdb">Apimdb</option>
-                        <option value="vidcloud">Vidcloud</option>
-                        <option value="streamnova">Streamnova</option>
-                        <option value="cinematrixx">Cinematrixx</option>
-                        <option value="reelverse">Reelverse</option>
-                        <option value="flixora">Flixora</option>
-                        <option value="novaprime">NovaPrimeFilms</option>
-                        <option value="cinehorizon">CineHorizon</option>
-                        <option value="velostreams">Velostreams</option>
-                        <option value="filmorahub">FilmoraHub</option>
-                        <option value="epicscreen">EpicScreen</option>
-                        <option value="cineluxe">CineLuxe</option>
                     </select>
                 </div>
                 <button onclick="toggleSettingsModal()" class="text-zinc-400 hover:text-zinc-100 transition-colors" title="Settings">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
                 </button>
             </div>
         </div>
@@ -115,7 +102,7 @@
     <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-8">
         
         <section id="home-view" class="space-y-12 my-6">
-            <div id="tracker-dashboard-panel" class="max-w-xl mx-auto bg-zinc-950 border border-zinc-800 rounded-lg p-5 shadow-xl space-y-4 hidden">
+            <div id="tracker-dashboard-panel" class="max-w-xl mx-auto bg-zinc-950 border border-zinc-800 rounded-lg p-5 shadow-xl space-y-4">
                 <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
                     <div>
                         <h3 class="text-sm font-semibold tracking-tight text-zinc-200">Continue Watching</h3>
@@ -134,7 +121,7 @@
                     <input type="text" id="hero-search-input" placeholder="Search titles..." 
                         class="w-full h-11 bg-zinc-900 border border-zinc-800 rounded-md pl-10 pr-4 text-base text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 shadow-xl">
                     <div class="absolute left-3.5 top-[14px] text-zinc-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                     </div>
                 </div>
             </div>
@@ -147,9 +134,7 @@
                         <button onclick="fetchTrending('tv', true)" id="toggle-tv" class="px-3 py-1 rounded text-zinc-400 hover:text-zinc-100/85">TV Shows</button>
                     </div>
                 </div>
-
                 <div id="media-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-
                 <div class="flex items-center justify-center gap-3 pt-6">
                     <button id="prev-page-btn" onclick="changeTrendingPage(-1)" class="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-zinc-100 border border-zinc-800 rounded bg-zinc-900/40">Prev</button>
                     <div id="page-indicator" class="text-xs text-zinc-500 font-mono">Page 1</div>
@@ -159,10 +144,33 @@
         </section>
 
         <section id="player-view" class="hidden space-y-6">
-            <button onclick="showHome()" class="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-100">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                Back to exploration
-            </button>
+            <div class="flex items-center justify-between">
+                <button onclick="showHome()" class="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+                    Back to exploration
+                </button>
+                <div class="flex items-center gap-3">
+                    <button id="download-btn" onclick="downloadCurrentVideo()" class="text-zinc-400 hover:text-zinc-100 transition-colors" title="Download Video">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    </button>
+                    <button id="bookmark-btn" onclick="toggleBookmark()" class="text-zinc-400 hover:text-yellow-500 transition-colors" title="Add to Watchlist">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                    </button>
+                    <button id="favorite-btn" onclick="toggleFavorite()" class="text-zinc-400 hover:text-red-500 transition-colors" title="Add to Favorites">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                    </button>
+                    <div class="flex items-center gap-2 ml-4">
+                        <label class="flex items-center gap-1 text-xs text-zinc-400">
+                            <input type="checkbox" id="autoplay-toggle" checked onchange="toggleAutoplay()">
+                            Auto-play Next
+                        </label>
+                        <label class="flex items-center gap-1 text-xs text-zinc-400">
+                            <input type="checkbox" id="autonext-toggle" checked onchange="toggleAutoNext()">
+                            Auto-Next Episode
+                        </label>
+                    </div>
+                </div>
+            </div>
 
             <div class="bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden shadow-2xl">
                 <div class="relative w-full aspect-video bg-black">
@@ -172,13 +180,29 @@
 
             <div id="tv-controls" class="hidden bg-zinc-950 border border-zinc-800 rounded-lg p-4 space-y-4">
                 <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
-                    <h4 class="text-sm font-medium tracking-tight">Navigation Matrix</h4>
+                    <h4 class="text-sm font-medium tracking-tight">Episode Navigation</h4>
                     <div class="flex items-center gap-2">
                         <span class="text-xs text-zinc-400">Season:</span>
                         <select id="season-select" onchange="onSeasonChange()" class="bg-zinc-900 border border-zinc-800 rounded px-2 py-0.5 text-xs text-zinc-300 focus:outline-none"></select>
                     </div>
                 </div>
                 <div id="episode-grid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-2"></div>
+            </div>
+            
+            <div id="upnext-preview" class="hidden bg-zinc-950 border border-zinc-800 rounded-lg p-4 animate-slideUp">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-zinc-400">Up Next</p>
+                        <p id="upnext-title" class="text-sm font-semibold text-zinc-200"></p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="cancelAutoNext()" class="px-3 py-1 text-xs bg-zinc-800 rounded hover:bg-zinc-700">Cancel</button>
+                        <button onclick="playNextEpisode()" class="px-3 py-1 text-xs bg-zinc-100 text-zinc-950 rounded hover:bg-zinc-200">Play Now</button>
+                    </div>
+                </div>
+                <div class="mt-2 h-1 bg-zinc-800 rounded-full overflow-hidden">
+                    <div id="upnext-timer" class="h-full bg-zinc-400 rounded-full" style="width: 0%"></div>
+                </div>
             </div>
         </section>
     </main>
@@ -193,59 +217,38 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                     </button>
                 </div>
-                
                 <div class="relative px-6 pb-6 -mt-20">
                     <div class="flex flex-col md:flex-row gap-6">
                         <div class="w-40 md:w-56 flex-shrink-0 mx-auto md:mx-0">
                             <img id="modal-poster" src="" alt="" class="w-full rounded-lg shadow-2xl border-2 border-zinc-800">
                         </div>
-                        
                         <div class="flex-1 space-y-4">
                             <div>
                                 <h2 id="modal-title" class="text-2xl md:text-3xl font-bold text-zinc-100 mb-2"></h2>
                                 <div class="flex flex-wrap items-center gap-3 text-sm">
                                     <span id="modal-year" class="text-zinc-400"></span>
                                     <span id="modal-runtime" class="text-zinc-400"></span>
-                                    <span id="modal-status" class="text-zinc-400"></span>
                                 </div>
                             </div>
-                            
                             <div class="flex items-center gap-4">
                                 <div class="flex items-center gap-2">
                                     <div class="relative">
                                         <svg class="w-12 h-12 transform -rotate-90">
                                             <circle cx="24" cy="24" r="20" fill="none" stroke="#27272a" stroke-width="3"/>
-                                            <circle id="modal-rating-circle" cx="24" cy="24" r="20" fill="none" stroke="#fbbf24" stroke-width="3" stroke-dasharray="125.6" stroke-dashoffset="0" stroke-linecap="round"/>
+                                            <circle id="modal-rating-circle" cx="24" cy="24" r="20" fill="none" stroke="#fbbf24" stroke-width="3" stroke-dasharray="125.6" stroke-dashoffset="0"/>
                                         </svg>
                                         <span id="modal-rating-text" class="absolute inset-0 flex items-center justify-center text-sm font-bold text-zinc-100">0</span>
                                     </div>
-                                    <div>
-                                        <div class="text-xs text-zinc-400">User Score</div>
-                                        <div id="modal-stars" class="text-yellow-500 text-sm"></div>
-                                    </div>
+                                    <div id="modal-stars" class="text-yellow-500 text-sm"></div>
                                 </div>
-                                
                                 <div class="flex flex-wrap gap-2" id="modal-genres"></div>
                             </div>
-                            
-                            <div>
-                                <h3 class="text-sm font-semibold text-zinc-300 mb-2">Overview</h3>
-                                <p id="modal-overview" class="text-sm text-zinc-400 leading-relaxed"></p>
-                            </div>
-                            
-                            <div class="grid grid-cols-2 gap-4 text-sm">
-                                <div id="modal-crew"></div>
-                                <div id="modal-cast"></div>
-                            </div>
-                            
+                            <div><h3 class="text-sm font-semibold text-zinc-300 mb-2">Overview</h3><p id="modal-overview" class="text-sm text-zinc-400 leading-relaxed"></p></div>
                             <div class="flex gap-3 pt-4">
-                                <button id="modal-watch-btn" class="flex-1 bg-zinc-100 text-zinc-950 px-4 py-2 rounded-lg font-semibold hover:bg-zinc-200 transition-colors flex items-center justify-center gap-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
-                                    Watch Now
-                                </button>
-                                <button onclick="closeDetailModal()" class="px-4 py-2 rounded-lg border border-zinc-700 text-zinc-400 hover:text-zinc-200 hover:border-zinc-600 transition-colors">
-                                    Close
-                                </button>
+                                <button id="modal-watch-btn" class="flex-1 bg-zinc-100 text-zinc-950 px-4 py-2 rounded-lg font-semibold hover:bg-zinc-200 transition-colors flex items-center justify-center gap-2">Play Now</button>
+                                <button id="modal-watchlist-btn" onclick="toggleBookmarkFromModal()" class="px-4 py-2 rounded-lg border border-zinc-700 text-zinc-400 hover:text-yellow-500 transition-colors">Watchlist</button>
+                                <button id="modal-favorite-btn" onclick="toggleFavoriteFromModal()" class="px-4 py-2 rounded-lg border border-zinc-700 text-zinc-400 hover:text-red-500 transition-colors">Favorite</button>
+                                <button onclick="closeDetailModal()" class="px-4 py-2 rounded-lg border border-zinc-700 text-zinc-400 hover:text-zinc-200">Close</button>
                             </div>
                         </div>
                     </div>
@@ -257,34 +260,16 @@
     <div id="settings-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm">
         <div class="bg-zinc-950 border border-zinc-800 rounded-lg max-w-md w-full shadow-2xl p-6 space-y-6">
             <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
-                <div>
-                    <h3 class="text-base font-semibold tracking-tight text-zinc-100">Settings</h3>
-                    <p class="text-xs text-zinc-500 mt-0.5">Change your settings</p>
-                </div>
-                <button onclick="toggleSettingsModal()" class="text-zinc-500 hover:text-zinc-300 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
+                <h3 class="text-base font-semibold tracking-tight text-zinc-100">Settings</h3>
+                <button onclick="toggleSettingsModal()" class="text-zinc-500 hover:text-zinc-300">Close</button>
             </div>
             <div class="space-y-4">
-                <div class="space-y-1.5">
-                    <label for="settings-default-provider" class="text-xs font-medium text-zinc-400">Primary Source</label>
-                    <select id="settings-default-provider" class="w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-500 cursor-pointer"></select>
-                </div>
-                <div class="pt-2 border-t border-zinc-800 space-y-3">
-                    <h4 class="text-xs font-medium text-zinc-400">Storage</h4>
-                    <div class="flex items-center justify-between bg-zinc-900/40 p-3 border border-zinc-800/80 rounded-md">
-                        <div>
-                            <p class="text-xs font-medium text-zinc-300">Delete cache</p>
-                            <p class="text-[10px] text-zinc-500 mt-0.5">Wipes your cache</p>
-                        </div>
-                        <button onclick="clearDeviceHistory(); toggleSettingsModal();" class="text-xs font-medium text-red-400 hover:text-red-300 border border-red-950/50 hover:border-red-900 bg-red-950/20 px-2.5 py-1.5 rounded transition-colors">Clear Cache</button>
-                    </div>
-                </div>
+                <div><label class="text-xs font-medium text-zinc-400">Primary Source</label><select id="settings-default-provider" class="w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 text-sm mt-1"></select></div>
+                <div><label class="flex items-center gap-2 text-xs font-medium text-zinc-400"><input type="checkbox" id="settings-autoplay" onchange="setAutoplaySetting()"> Auto-play Next Episode</label></div>
+                <div><label class="flex items-center gap-2 text-xs font-medium text-zinc-400"><input type="checkbox" id="settings-autonext" onchange="setAutoNextSetting()"> Auto-Next Episode (5s countdown)</label></div>
+                <div class="pt-2 border-t border-zinc-800"><button onclick="clearAllData()" class="text-xs font-medium text-red-400 hover:text-red-300">Clear All Cache & History</button></div>
             </div>
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="toggleSettingsModal()" class="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-zinc-200 transition-colors border border-zinc-800 rounded bg-zinc-900">Cancel</button>
-                <button onclick="saveClientSettings()" class="px-3 py-1.5 text-xs font-medium bg-zinc-100 text-zinc-950 hover:bg-zinc-200 rounded transition-colors">Save Configurations</button>
-            </div>
+            <div class="flex justify-end"><button onclick="saveClientSettings()" class="px-3 py-1.5 text-xs font-medium bg-zinc-100 text-zinc-950 rounded">Save</button></div>
         </div>
     </div>
 
@@ -292,54 +277,33 @@
         &copy; 2026 hylton.
     </footer>
 
+    <div id="toast" class="toast-notification hidden bg-zinc-800 text-zinc-200 px-4 py-2 rounded-lg shadow-lg text-sm"></div>
+
     <script>
         const API_KEY = '3da63f2030991fb208636501d053bf0d';
         const BASE_URL = 'https://api.themoviedb.org/3';
         const IMAGE_URL = 'https://image.tmdb.org/t/p/w500';
         const BACKDROP_URL = 'https://image.tmdb.org/t/p/original';
 
-        let activeType = 'movie'; 
-        let activeId = '';
-        let activeTitle = '';
-        let activeSeason = 1;
-        let activeEpisode = 1;
-        let trendingPage = 1;
-        let trendingTotalPages = 1;
-        let currentSearchQuery = '';
+        let activeType = 'movie', activeId = '', activeTitle = '', activeSeason = 1, activeEpisode = 1;
+        let trendingPage = 1, trendingTotalPages = 1, currentSearchQuery = '';
+        let autoplayEnabled = true, autoNextEnabled = true;
+        let autoNextTimer = null, upnextData = null;
+        let currentMediaData = null;
+        let currentVideoUrl = '';
 
-        const genreMap = {
-            movie: {
-                28: 'Action', 12: 'Adventure', 16: 'Animation', 35: 'Comedy', 80: 'Crime',
-                99: 'Documentary', 18: 'Drama', 10751: 'Family', 14: 'Fantasy', 36: 'History',
-                27: 'Horror', 10402: 'Music', 9648: 'Mystery', 10749: 'Romance', 878: 'Sci-Fi',
-                10770: 'TV Movie', 53: 'Thriller', 10752: 'War', 37: 'Western'
-            },
-            tv: {
-                10759: 'Action/Adventure', 16: 'Animation', 35: 'Comedy', 80: 'Crime',
-                99: 'Documentary', 18: 'Drama', 10751: 'Family', 10762: 'Kids', 9648: 'Mystery',
-                10763: 'News', 10764: 'Reality', 10765: 'Sci-Fi/Fantasy', 10766: 'Soap',
-                10767: 'Talk', 10768: 'War/Politics'
-            }
-        };
-
-        function safeLocalStorage() {
-            try { localStorage.setItem('test', 'test'); localStorage.removeItem('test'); return true; } 
-            catch(e) { return false; }
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
         }
+
+        function safeLocalStorage() { try { localStorage.setItem('test', 'test'); localStorage.removeItem('test'); return true; } catch(e) { return false; } }
         const storageAvailable = safeLocalStorage();
-
-        function getItem(key, defaultValue = null) {
-            if (!storageAvailable) return defaultValue;
-            try { return localStorage.getItem(key) || defaultValue; } catch(e) { return defaultValue; }
-        }
-        function setItem(key, value) {
-            if (!storageAvailable) return false;
-            try { localStorage.setItem(key, value); return true; } catch(e) { return false; }
-        }
-        function removeItem(key) {
-            if (!storageAvailable) return false;
-            try { localStorage.removeItem(key); return true; } catch(e) { return false; }
-        }
+        function getItem(key, defaultValue = null) { if (!storageAvailable) return defaultValue; try { return localStorage.getItem(key) || defaultValue; } catch(e) { return defaultValue; } }
+        function setItem(key, value) { if (!storageAvailable) return false; try { localStorage.setItem(key, value); return true; } catch(e) { return false; } }
+        function removeItem(key) { if (!storageAvailable) return false; try { localStorage.removeItem(key); return true; } catch(e) { return false; } }
 
         function getEmbedUrl(provider, type, id, s = 1, e = 1) {
             const providers = {
@@ -351,35 +315,158 @@
                 autoembed: type === 'movie' ? `https://player.autoembed.to/movie/${id}` : `https://player.autoembed.to/tv/${id}/${s}/${e}`,
                 twoembed: type === 'movie' ? `https://www.2embed.cc/embed/${id}` : `https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}`,
                 embedsu: type === 'movie' ? `https://embed.su/embed/movie/${id}` : `https://embed.su/embed/tv/${id}/${s}/${e}`,
-                vidsrcpro: type === 'movie' ? `https://vidsrc.pro/embed/movie/${id}` : `https://vidsrc.pro/embed/tv/${id}/${s}/${e}`,
-                rivestream: type === 'movie' ? `https://api.rivestream.xyz/embed/movie?tmdb=${id}` : `https://api.rivestream.xyz/embed/tv?tmdb=${id}&season=${s}&episode=${e}`,
-                smashy: type === 'movie' ? `https://embed.smashystream.com/playere.php?tmdb=${id}` : `https://embed.smashystream.com/playere.php?tmdb=${id}&season=${s}&episode=${e}`,
-                moviesapi: type === 'movie' ? `https://moviesapi.club/movie/${id}` : `https://moviesapi.club/tv/${id}-${s}-${e}`,
                 superembed: type === 'movie' ? `https://multiembed.mov/?video_id=${id}&tmdb=1` : `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}`,
-                novera: `https://player.novera.website/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`,
-                cinepro: `https://cinepro.org/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`,
-                movieweb: `https://backend.movie-web.app/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}`,
             };
             return providers[provider] || providers.vidkingnet;
         }
 
-        function getRatingColor(rating) {
-            if (rating >= 8) return 'text-emerald-400';
-            if (rating >= 7) return 'text-green-400';
-            if (rating >= 6) return 'text-yellow-400';
-            if (rating >= 5) return 'text-orange-400';
-            return 'text-red-400';
+        function downloadCurrentVideo() {
+            if (currentVideoUrl && currentVideoUrl !== 'about:blank') {
+                try {
+                    // Create a temporary anchor element
+                    const link = document.createElement('a');
+                    link.href = currentVideoUrl;
+                    link.download = `${activeTitle.replace(/[^a-z0-9]/gi, '_')}.mp4`;
+                    link.target = '_blank';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    showToast(`Download started for ${activeTitle}`);
+                } catch (error) {
+                    // If direct download fails, open in new tab
+                    window.open(currentVideoUrl, '_blank');
+                    showToast(`Opening video source in new tab for download`);
+                }
+            } else {
+                showToast('No video loaded. Please play a video first.', 'error');
+            }
         }
 
-        function renderStars(rating) {
-            const stars = (rating / 2).toFixed(1);
-            const fullStars = Math.floor(rating / 2);
-            const hasHalfStar = (rating / 2) % 1 >= 0.5;
-            let starStr = '';
-            for (let i = 0; i < fullStars; i++) starStr += '★';
-            if (hasHalfStar) starStr += '½';
-            for (let i = 0; i < 5 - Math.ceil(rating / 2); i++) starStr += '☆';
-            return starStr;
+        function getWatchlist() { try { return JSON.parse(localStorage.getItem('hylton_watchlist')) || []; } catch(e) { return []; } }
+        function getFavorites() { try { return JSON.parse(localStorage.getItem('hylton_favorites')) || []; } catch(e) { return []; } }
+        
+        function updateBadges() {
+            const watchlist = getWatchlist();
+            const favorites = getFavorites();
+            const wBadge = document.getElementById('watchlist-badge');
+            const fBadge = document.getElementById('favorites-badge');
+            if (watchlist.length > 0) { wBadge.textContent = watchlist.length; wBadge.classList.remove('hidden'); }
+            else { wBadge.classList.add('hidden'); }
+            if (favorites.length > 0) { fBadge.textContent = favorites.length; fBadge.classList.remove('hidden'); }
+            else { fBadge.classList.add('hidden'); }
+        }
+
+        function toggleBookmark() {
+            let watchlist = getWatchlist();
+            const exists = watchlist.find(i => i.id === activeId);
+            if (exists) { watchlist = watchlist.filter(i => i.id !== activeId); showToast(`Removed "${activeTitle}" from watchlist`); }
+            else { watchlist.push({ id: activeId, type: activeType, title: activeTitle, timestamp: Date.now() }); showToast(`Added "${activeTitle}" to watchlist`); }
+            localStorage.setItem('hylton_watchlist', JSON.stringify(watchlist));
+            updateBadges();
+            const watchlistBtn = document.getElementById('bookmark-btn');
+            if (exists) watchlistBtn.classList.remove('text-yellow-500'); else watchlistBtn.classList.add('text-yellow-500');
+        }
+
+        function toggleFavorite() {
+            let favorites = getFavorites();
+            const exists = favorites.find(i => i.id === activeId);
+            if (exists) { favorites = favorites.filter(i => i.id !== activeId); showToast(`Removed "${activeTitle}" from favorites`); }
+            else { favorites.push({ id: activeId, type: activeType, title: activeTitle, timestamp: Date.now() }); showToast(`Added "${activeTitle}" to favorites`); }
+            localStorage.setItem('hylton_favorites', JSON.stringify(favorites));
+            updateBadges();
+            const favBtn = document.getElementById('favorite-btn');
+            if (exists) favBtn.classList.remove('text-red-500'); else favBtn.classList.add('text-red-500');
+        }
+
+        function toggleBookmarkFromModal() { if (currentMediaData) { activeId = currentMediaData.id; activeTitle = currentMediaData.title; activeType = currentMediaData.type; toggleBookmark(); } }
+        function toggleFavoriteFromModal() { if (currentMediaData) { activeId = currentMediaData.id; activeTitle = currentMediaData.title; activeType = currentMediaData.type; toggleFavorite(); } }
+
+        function showWatchlist() {
+            const watchlist = getWatchlist();
+            if (watchlist.length === 0) { showToast('Your watchlist is empty', 'info'); return; }
+            document.getElementById('section-title').innerText = 'My Watchlist';
+            renderWatchlistFavoritesGrid(watchlist, 'watchlist');
+            document.getElementById('prev-page-btn').style.display = 'none';
+            document.getElementById('next-page-btn').style.display = 'none';
+            document.getElementById('page-indicator').style.display = 'none';
+        }
+
+        function showFavorites() {
+            const favorites = getFavorites();
+            if (favorites.length === 0) { showToast('Your favorites list is empty', 'info'); return; }
+            document.getElementById('section-title').innerText = 'My Favorites';
+            renderWatchlistFavoritesGrid(favorites, 'favorites');
+            document.getElementById('prev-page-btn').style.display = 'none';
+            document.getElementById('next-page-btn').style.display = 'none';
+            document.getElementById('page-indicator').style.display = 'none';
+        }
+
+        async function renderWatchlistFavoritesGrid(items, type) {
+            const grid = document.getElementById('media-grid');
+            grid.innerHTML = '';
+            for (const item of items) {
+                try {
+                    const res = await fetch(`${BASE_URL}/${item.type}/${item.id}?api_key=${API_KEY}`);
+                    const details = await res.json();
+                    const poster = details.poster_path ? `${IMAGE_URL}${details.poster_path}` : '';
+                    const rating = details.vote_average ? details.vote_average.toFixed(1) : 'N/A';
+                    const card = document.createElement('div');
+                    card.className = "group cursor-pointer bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden hover:border-zinc-700 transition-all";
+                    card.onclick = () => showDetailModal(item.type, item.id, item.title);
+                    card.innerHTML = `<div class="flex flex-col sm:flex-row"><div class="sm:w-40 relative overflow-hidden"><img src="${poster}" class="w-full h-full object-cover"></div><div class="flex-1 p-4"><h3 class="font-semibold">${escapeHtml(item.title)}</h3><div class="flex items-center gap-2 mt-1"><span class="text-xs text-yellow-500">Rating: ${rating}</span></div><button onclick="event.stopPropagation(); removeFromList('${item.id}', '${type}')" class="mt-2 text-xs text-red-400 hover:text-red-300">Remove</button></div></div>`;
+                    grid.appendChild(card);
+                } catch(e) { console.error(e); }
+            }
+        }
+
+        function removeFromList(id, listType) {
+            if (listType === 'watchlist') {
+                let watchlist = getWatchlist().filter(i => i.id !== id);
+                localStorage.setItem('hylton_watchlist', JSON.stringify(watchlist));
+                showWatchlist();
+            } else {
+                let favorites = getFavorites().filter(i => i.id !== id);
+                localStorage.setItem('hylton_favorites', JSON.stringify(favorites));
+                showFavorites();
+            }
+            updateBadges();
+        }
+
+        function toggleAutoplay() { autoplayEnabled = document.getElementById('autoplay-toggle').checked; setItem('autoplay', autoplayEnabled); }
+        function toggleAutoNext() { autoNextEnabled = document.getElementById('autonext-toggle').checked; setItem('autonext', autoNextEnabled); }
+        function setAutoplaySetting() { autoplayEnabled = document.getElementById('settings-autoplay').checked; document.getElementById('autoplay-toggle').checked = autoplayEnabled; setItem('autoplay', autoplayEnabled); }
+        function setAutoNextSetting() { autoNextEnabled = document.getElementById('settings-autonext').checked; document.getElementById('autonext-toggle').checked = autoNextEnabled; setItem('autonext', autoNextEnabled); }
+
+        async function playNextEpisode() {
+            if (autoNextTimer) clearInterval(autoNextTimer);
+            document.getElementById('upnext-preview').classList.add('hidden');
+            if (upnextData) {
+                activeSeason = upnextData.season;
+                activeEpisode = upnextData.episode;
+                await buildEpisodeGrid(activeId, activeSeason);
+                updatePlayerUrl();
+                recordWatchHistory();
+            }
+        }
+
+        function cancelAutoNext() {
+            if (autoNextTimer) clearInterval(autoNextTimer);
+            document.getElementById('upnext-preview').classList.add('hidden');
+        }
+
+        function scheduleAutoNext(season, episode, title) {
+            if (!autoNextEnabled) return;
+            upnextData = { season, episode, title };
+            document.getElementById('upnext-title').innerText = `Season ${season} Episode ${episode}: ${title}`;
+            document.getElementById('upnext-preview').classList.remove('hidden');
+            let timeLeft = 5;
+            const timerBar = document.getElementById('upnext-timer');
+            if (autoNextTimer) clearInterval(autoNextTimer);
+            autoNextTimer = setInterval(() => {
+                timeLeft--;
+                timerBar.style.width = `${(timeLeft / 5) * 100}%`;
+                if (timeLeft <= 0) { clearInterval(autoNextTimer); playNextEpisode(); }
+            }, 1000);
         }
 
         function setPageIndicator() {
@@ -401,32 +488,33 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            autoplayEnabled = getItem('autoplay') !== 'false';
+            autoNextEnabled = getItem('autonext') !== 'false';
+            document.getElementById('autoplay-toggle').checked = autoplayEnabled;
+            document.getElementById('autonext-toggle').checked = autoNextEnabled;
+            document.getElementById('settings-autoplay').checked = autoplayEnabled;
+            document.getElementById('settings-autonext').checked = autoNextEnabled;
             initializePreferences();
             fetchTrending('movie', true);
             syncDashboardUI();
+            updateBadges();
             
             const handleSearch = async (e) => {
                 const query = e.target.value.trim();
                 currentSearchQuery = query;
                 if (query.length > 2) {
-                    try {
-                        const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
-                        const data = await res.json();
-                        const filtered = data.results.filter(i => i.media_type === 'movie' || i.media_type === 'tv');
-                        document.getElementById('section-title').innerText = `Search results for: "${query}"`;
-                        const detailedItems = await Promise.all(filtered.map(async (item) => {
-                            const type = item.media_type;
-                            const detailRes = await fetch(`${BASE_URL}/${type}/${item.id}?api_key=${API_KEY}`);
-                            const details = await detailRes.json();
-                            return { ...item, details };
-                        }));
-                        renderDetailedGrid(detailedItems);
-                        document.getElementById('prev-page-btn').style.display = 'none';
-                        document.getElementById('next-page-btn').style.display = 'none';
-                        document.getElementById('page-indicator').style.display = 'none';
-                    } catch (err) {
-                        console.error('Search failed:', err);
-                    }
+                    const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
+                    const data = await res.json();
+                    const filtered = data.results.filter(i => i.media_type === 'movie' || i.media_type === 'tv');
+                    document.getElementById('section-title').innerText = `Search results for: "${query}"`;
+                    const detailed = await Promise.all(filtered.map(async item => {
+                        const detailRes = await fetch(`${BASE_URL}/${item.media_type}/${item.id}?api_key=${API_KEY}`);
+                        return { ...item, details: await detailRes.json() };
+                    }));
+                    renderDetailedGrid(detailed);
+                    document.getElementById('prev-page-btn').style.display = 'none';
+                    document.getElementById('next-page-btn').style.display = 'none';
+                    document.getElementById('page-indicator').style.display = 'none';
                 } else if (query.length === 0) {
                     document.getElementById('prev-page-btn').style.display = 'flex';
                     document.getElementById('next-page-btn').style.display = 'flex';
@@ -442,230 +530,117 @@
 
         function initializePreferences() {
             const savedProvider = getItem('hylton_preferred_provider', 'vidkingnet');
-            const mainSelect = document.getElementById('provider-select');
-            if (mainSelect) mainSelect.value = savedProvider;
-            const modalSelect = document.getElementById('settings-default-provider');
-            if (modalSelect && mainSelect) {
-                modalSelect.innerHTML = mainSelect.innerHTML;
-                modalSelect.value = savedProvider;
-            }
+            document.getElementById('provider-select').value = savedProvider;
+            document.getElementById('settings-default-provider').innerHTML = document.getElementById('provider-select').innerHTML;
+            document.getElementById('settings-default-provider').value = savedProvider;
         }
 
         function toggleSettingsModal() {
             const modal = document.getElementById('settings-modal');
-            if (!modal) return;
-            if (modal.classList.contains('hidden')) {
-                const currentProvider = getItem('hylton_preferred_provider', 'vidkingnet');
-                const modalSelect = document.getElementById('settings-default-provider');
-                if (modalSelect) modalSelect.value = currentProvider;
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-            } else {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            }
+            modal.classList.toggle('hidden');
+            modal.classList.toggle('flex');
         }
 
         function saveClientSettings() {
-            const selected = document.getElementById('settings-default-provider')?.value;
-            if (selected) {
-                setItem('hylton_preferred_provider', selected);
-                const mainSelect = document.getElementById('provider-select');
-                if (mainSelect) mainSelect.value = selected;
-                if (!document.getElementById('player-view')?.classList.contains('hidden')) updatePlayerUrl();
-            }
+            const selected = document.getElementById('settings-default-provider').value;
+            setItem('hylton_preferred_provider', selected);
+            document.getElementById('provider-select').value = selected;
+            setAutoplaySetting();
+            setAutoNextSetting();
             toggleSettingsModal();
+            showToast('Settings saved');
         }
 
-        function onProviderChange() {
-            const selected = document.getElementById('provider-select')?.value;
-            if (selected) {
-                setItem('hylton_preferred_provider', selected);
-                updatePlayerUrl();
-            }
-        }
+        function onProviderChange() { setItem('hylton_preferred_provider', document.getElementById('provider-select').value); updatePlayerUrl(); }
 
         async function fetchTrending(type, resetPage = false) {
             activeType = type;
-            const movieBtn = document.getElementById('toggle-movie');
-            const tvBtn = document.getElementById('toggle-tv');
-            const sectionTitle = document.getElementById('section-title');
-            
-            if (type === 'movie') {
-                if (movieBtn) movieBtn.className = "px-3 py-1 rounded bg-zinc-800 text-zinc-100 font-medium";
-                if (tvBtn) tvBtn.className = "px-3 py-1 rounded text-zinc-400 hover:text-zinc-100";
-                if (sectionTitle) sectionTitle.innerText = "Trending Movies";
-            } else {
-                if (tvBtn) tvBtn.className = "px-3 py-1 rounded bg-zinc-800 text-zinc-100 font-medium";
-                if (movieBtn) movieBtn.className = "px-3 py-1 rounded text-zinc-400 hover:text-zinc-100";
-                if (sectionTitle) sectionTitle.innerText = "Trending TV Series";
-            }
+            document.getElementById('toggle-movie').className = type === 'movie' ? "px-3 py-1 rounded bg-zinc-800 text-zinc-100 font-medium" : "px-3 py-1 rounded text-zinc-400 hover:text-zinc-100";
+            document.getElementById('toggle-tv').className = type === 'tv' ? "px-3 py-1 rounded bg-zinc-800 text-zinc-100 font-medium" : "px-3 py-1 rounded text-zinc-400 hover:text-zinc-100";
+            document.getElementById('section-title').innerText = type === 'movie' ? 'Trending Movies' : 'Trending TV Series';
             if (resetPage) trendingPage = 1;
-
-            try {
-                const res = await fetch(`${BASE_URL}/trending/${type}/week?api_key=${API_KEY}&page=${trendingPage}`);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const data = await res.json();
-                trendingTotalPages = Math.min(data.total_pages || 1, 500);
-                setPageIndicator();
-                const detailedItems = await Promise.all(data.results.map(async (item) => {
-                    const detailRes = await fetch(`${BASE_URL}/${type}/${item.id}?api_key=${API_KEY}`);
-                    const details = await detailRes.json();
-                    return { ...item, details };
-                }));
-                renderDetailedGrid(detailedItems);
-            } catch (err) {
-                document.getElementById('media-grid').innerHTML = '<div class="col-span-full text-center text-zinc-500 py-12 text-sm">Failed to load content.</div>';
-            }
+            const res = await fetch(`${BASE_URL}/trending/${type}/week?api_key=${API_KEY}&page=${trendingPage}`);
+            const data = await res.json();
+            trendingTotalPages = Math.min(data.total_pages || 1, 500);
+            setPageIndicator();
+            const detailed = await Promise.all(data.results.map(async item => {
+                const detailRes = await fetch(`${BASE_URL}/${type}/${item.id}?api_key=${API_KEY}`);
+                return { ...item, details: await detailRes.json() };
+            }));
+            renderDetailedGrid(detailed);
         }
 
         function renderDetailedGrid(items) {
             const grid = document.getElementById('media-grid');
-            if (!grid) return;
             grid.innerHTML = '';
-            if (!items || items.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center text-zinc-500 py-12 text-sm">No results found.</div>`;
-                return;
-            }
             items.forEach(item => {
-                const type = item.media_type || activeType;
                 const details = item.details;
                 const title = item.title || item.name;
                 const year = (item.release_date || item.first_air_date || '').split('-')[0] || 'N/A';
-                const poster = item.poster_path ? `${IMAGE_URL}${item.poster_path}` : 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?q=80&w=500&auto=format&fit=crop';
+                const poster = item.poster_path ? `${IMAGE_URL}${item.poster_path}` : '';
                 const rating = details.vote_average ? details.vote_average.toFixed(1) : 'N/A';
-                const overview = details.overview || 'No description available.';
-                const genres = details.genres?.slice(0, 3).map(g => g.name) || [];
-                
+                const overview = details.overview ? details.overview.substring(0, 120) + '...' : 'No description available';
+                const genres = details.genres ? details.genres.slice(0, 2).map(g => g.name) : [];
                 const card = document.createElement('div');
-                card.className = "group cursor-pointer bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden hover:border-zinc-700 transition-all duration-300 hover:shadow-xl";
-                card.onclick = () => showDetailModal(type, item.id, title);
-                card.innerHTML = `
-                    <div class="flex flex-col sm:flex-row">
-                        <div class="sm:w-40 lg:w-48 relative overflow-hidden">
-                            <img src="${poster}" alt="${title}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
-                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                <div class="bg-zinc-950/80 p-3 rounded-full border border-zinc-700 text-zinc-100">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex-1 p-4 space-y-2">
-                            <div class="flex items-start justify-between gap-2">
-                                <h3 class="text-base font-semibold text-zinc-100 group-hover:text-white transition-colors line-clamp-1">${escapeHtml(title)}</h3>
-                                <span class="text-xs font-mono text-zinc-500 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800">${year}</span>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <div class="flex items-center gap-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="text-yellow-500"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                                    <span class="text-sm font-semibold ${getRatingColor(parseFloat(rating))}">${rating}</span>
-                                    <span class="text-xs text-zinc-500">/10</span>
-                                </div>
-                                <div class="text-xs text-zinc-400">${renderStars(parseFloat(rating))}</div>
-                            </div>
-                            ${genres.length > 0 ? `<div class="flex flex-wrap gap-1.5">${genres.map(g => `<span class="text-[10px] px-2 py-0.5 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300">${escapeHtml(g)}</span>`).join('')}</div>` : ''}
-                            <p class="text-xs text-zinc-400 leading-relaxed card-description">${escapeHtml(overview)}</p>
-                            <div class="flex items-center gap-2 pt-1">
-                                <span class="text-[10px] uppercase tracking-wider text-zinc-500 border-l-2 border-zinc-700 pl-2">${type === 'movie' ? 'MOVIE' : 'TV SERIES'}</span>
-                                ${type === 'movie' && details.runtime ? `<span class="text-[10px] text-zinc-500">⏱ ${details.runtime} min</span>` : ''}
-                            </div>
-                        </div>
-                    </div>
-                `;
+                card.className = "group cursor-pointer bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden hover:border-zinc-700 transition-all hover:shadow-xl";
+                card.onclick = () => showDetailModal(activeType, item.id, title);
+                card.innerHTML = `<div class="flex flex-col sm:flex-row"><div class="sm:w-40 relative overflow-hidden"><img src="${poster}" class="w-full h-full object-cover group-hover:scale-105 transition-transform"><div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center"><div class="bg-zinc-950/80 p-3 rounded-full"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg></div></div></div><div class="flex-1 p-4"><div class="flex justify-between"><h3 class="font-semibold text-zinc-100">${escapeHtml(title)}</h3><span class="text-xs text-zinc-500">${year}</span></div><div class="flex items-center gap-2 mt-1"><span class="text-xs text-yellow-500">Rating: ${rating}</span><span class="text-xs text-zinc-500">/10</span></div><div class="flex gap-1 mt-1">${genres.map(g => `<span class="text-[10px] px-2 py-0.5 rounded-full bg-zinc-900 border border-zinc-800">${escapeHtml(g)}</span>`).join('')}</div><p class="text-xs text-zinc-400 mt-2 line-clamp-2">${escapeHtml(overview)}</p></div></div>`;
                 grid.appendChild(card);
             });
         }
 
         async function showDetailModal(type, id, title) {
-            try {
-                const res = await fetch(`${BASE_URL}/${type}/${id}?api_key=${API_KEY}&append_to_response=credits`);
-                const data = await res.json();
-                
-                const backdrop = data.backdrop_path ? `${BACKDROP_URL}${data.backdrop_path}` : '';
-                const poster = data.poster_path ? `${IMAGE_URL}${data.poster_path}` : 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?q=80&w=500&auto=format&fit=crop';
-                const year = (data.release_date || data.first_air_date || '').split('-')[0] || 'N/A';
-                const rating = data.vote_average ? data.vote_average.toFixed(1) : 'N/A';
-                const runtime = type === 'movie' && data.runtime ? `${data.runtime} min` : type === 'tv' ? `${data.number_of_seasons} Season${data.number_of_seasons !== 1 ? 's' : ''}` : '';
-                const status = data.status || 'N/A';
-                const overview = data.overview || 'No description available.';
-                const genres = data.genres?.map(g => g.name) || [];
-                
-                const director = data.credits?.crew?.find(p => p.job === 'Director')?.name || 'N/A';
-                const cast = data.credits?.cast?.slice(0, 3).map(c => c.name).join(', ') || 'N/A';
-                
-                document.getElementById('modal-backdrop').style.backgroundImage = backdrop ? `linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(24,24,27,0.95)), url(${backdrop})` : '';
-                document.getElementById('modal-poster').src = poster;
-                document.getElementById('modal-title').innerText = title;
-                document.getElementById('modal-year').innerHTML = `<span class="text-zinc-500">📅</span> ${year}`;
-                document.getElementById('modal-runtime').innerHTML = `<span class="text-zinc-500">⏱</span> ${runtime}`;
-                document.getElementById('modal-status').innerHTML = `<span class="text-zinc-500">📺</span> ${status}`;
-                document.getElementById('modal-rating-text').innerText = rating;
-                document.getElementById('modal-stars').innerHTML = renderStars(parseFloat(rating));
-                document.getElementById('modal-overview').innerText = overview;
-                document.getElementById('modal-crew').innerHTML = `<div class="text-zinc-500 text-xs mb-1">Director</div><div class="text-zinc-300">${escapeHtml(director)}</div>`;
-                document.getElementById('modal-cast').innerHTML = `<div class="text-zinc-500 text-xs mb-1">Cast</div><div class="text-zinc-300 text-sm">${escapeHtml(cast)}</div>`;
-                
-                const genresHtml = genres.map(g => `<span class="text-xs px-2 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300">${escapeHtml(g)}</span>`).join('');
-                document.getElementById('modal-genres').innerHTML = genresHtml;
-                
-                const circumference = 2 * Math.PI * 20;
-                const offset = circumference - (data.vote_average / 10) * circumference;
-                document.getElementById('modal-rating-circle').style.strokeDasharray = `${circumference}`;
-                document.getElementById('modal-rating-circle').style.strokeDashoffset = offset;
-                
-                const watchBtn = document.getElementById('modal-watch-btn');
-                watchBtn.onclick = () => {
-                    closeDetailModal();
-                    launchPlayer(type, id, title);
-                };
-                
-                document.getElementById('detail-modal').classList.remove('hidden');
-                document.getElementById('detail-modal').classList.add('flex');
-            } catch (err) {
-                console.error('Failed to load details:', err);
-            }
+            currentMediaData = { id, type, title };
+            const res = await fetch(`${BASE_URL}/${type}/${id}?api_key=${API_KEY}&append_to_response=credits`);
+            const data = await res.json();
+            document.getElementById('modal-backdrop').style.backgroundImage = data.backdrop_path ? `linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(24,24,27,0.95)), url(${BACKDROP_URL}${data.backdrop_path})` : '';
+            document.getElementById('modal-poster').src = data.poster_path ? `${IMAGE_URL}${data.poster_path}` : '';
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-year').innerHTML = `Year: ${(data.release_date || data.first_air_date || '').split('-')[0] || 'N/A'}`;
+            document.getElementById('modal-runtime').innerHTML = type === 'movie' ? `Duration: ${data.runtime} min` : `Seasons: ${data.number_of_seasons}`;
+            const rating = data.vote_average || 0;
+            document.getElementById('modal-rating-text').innerText = rating.toFixed(1);
+            const circumference = 2 * Math.PI * 20;
+            document.getElementById('modal-rating-circle').style.strokeDashoffset = circumference - (rating / 10) * circumference;
+            const starCount = Math.floor(rating / 2);
+            document.getElementById('modal-stars').innerHTML = '★'.repeat(starCount) + '☆'.repeat(5 - starCount);
+            document.getElementById('modal-overview').innerText = data.overview || 'No description available.';
+            document.getElementById('modal-genres').innerHTML = (data.genres || []).slice(0, 4).map(g => `<span class="text-xs px-2 py-1 rounded-full bg-zinc-900 border border-zinc-800">${g.name}</span>`).join('');
+            document.getElementById('modal-watch-btn').onclick = () => { closeDetailModal(); launchPlayer(type, id, title); };
+            document.getElementById('detail-modal').classList.remove('hidden');
+            document.getElementById('detail-modal').classList.add('flex');
         }
 
-        function closeDetailModal() {
-            document.getElementById('detail-modal').classList.add('hidden');
-            document.getElementById('detail-modal').classList.remove('flex');
-        }
-
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
-        }
+        function closeDetailModal() { document.getElementById('detail-modal').classList.add('hidden'); document.getElementById('detail-modal').classList.remove('flex'); }
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
 
         async function launchPlayer(type, id, title = '') {
-            activeType = type;
-            activeId = id;
-            activeTitle = title;
-            activeSeason = 1;
-            activeEpisode = 1;
-            
+            activeType = type; activeId = id; activeTitle = title; activeSeason = 1; activeEpisode = 1;
             document.getElementById('home-view').classList.add('hidden');
             document.getElementById('player-view').classList.remove('hidden');
             document.getElementById('nav-search-container').classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-
+            window.scrollTo({ top: 0 });
+            const bookmarkBtn = document.getElementById('bookmark-btn');
+            const favBtn = document.getElementById('favorite-btn');
+            const isBookmarked = getWatchlist().find(i => i.id === id);
+            const isFavorited = getFavorites().find(i => i.id === id);
+            if (isBookmarked) bookmarkBtn.classList.add('text-yellow-500'); else bookmarkBtn.classList.remove('text-yellow-500');
+            if (isFavorited) favBtn.classList.add('text-red-500'); else favBtn.classList.remove('text-red-500');
             if (type === 'tv') {
                 document.getElementById('tv-controls').classList.remove('hidden');
-                try {
-                    const res = await fetch(`${BASE_URL}/tv/${id}?api_key=${API_KEY}`);
-                    const data = await res.json();
-                    activeTitle = data.name;
-                    retrieveSavedProgressMarker();
-                    const selector = document.getElementById('season-select');
-                    selector.innerHTML = '';
-                    for (let i = 1; i <= data.number_of_seasons; i++) {
-                        const opt = document.createElement('option');
-                        opt.value = i;
-                        opt.innerText = `Season ${i}`;
-                        if(i === activeSeason) opt.selected = true;
-                        selector.appendChild(opt);
-                    }
-                    await buildEpisodeGrid(id, activeSeason);
-                } catch(err) { console.error(err); }
+                const res = await fetch(`${BASE_URL}/tv/${id}?api_key=${API_KEY}`);
+                const data = await res.json();
+                activeTitle = data.name;
+                retrieveSavedProgress();
+                const selector = document.getElementById('season-select');
+                selector.innerHTML = '';
+                for (let i = 1; i <= data.number_of_seasons; i++) {
+                    const opt = document.createElement('option');
+                    opt.value = i; opt.innerText = `Season ${i}`;
+                    if (i === activeSeason) opt.selected = true;
+                    selector.appendChild(opt);
+                }
+                await buildEpisodeGrid(id, activeSeason);
             } else {
                 document.getElementById('tv-controls').classList.add('hidden');
                 updatePlayerUrl();
@@ -674,44 +649,34 @@
         }
 
         async function buildEpisodeGrid(id, seasonNum) {
-            try {
-                const res = await fetch(`${BASE_URL}/tv/${id}/season/${seasonNum}?api_key=${API_KEY}`);
-                const data = await res.json();
-                const grid = document.getElementById('episode-grid');
-                grid.innerHTML = '';
-                data.episodes.forEach(ep => {
-                    const btn = document.createElement('button');
-                    btn.innerText = ep.episode_number;
-                    btn.className = `h-8 text-xs font-mono rounded border transition-all ${ep.episode_number === activeEpisode ? 'bg-zinc-100 border-zinc-100 text-zinc-950 font-bold' : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-zinc-100'}`;
-                    btn.onclick = () => {
-                        activeSeason = seasonNum;
-                        activeEpisode = ep.episode_number;
-                        buildEpisodeGrid(activeId, activeSeason);
-                        updatePlayerUrl();
-                        recordWatchHistory();
-                    };
-                    grid.appendChild(btn);
-                });
-                updatePlayerUrl();
-            } catch(err) { console.error(err); }
+            const res = await fetch(`${BASE_URL}/tv/${id}/season/${seasonNum}?api_key=${API_KEY}`);
+            const data = await res.json();
+            const grid = document.getElementById('episode-grid');
+            grid.innerHTML = '';
+            data.episodes.forEach(ep => {
+                const btn = document.createElement('button');
+                btn.innerText = ep.episode_number;
+                btn.className = `h-8 text-xs font-mono rounded border transition-all ${ep.episode_number === activeEpisode ? 'bg-zinc-100 border-zinc-100 text-zinc-950 font-bold' : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-600'}`;
+                btn.onclick = () => { activeSeason = seasonNum; activeEpisode = ep.episode_number; buildEpisodeGrid(id, activeSeason); updatePlayerUrl(); recordWatchHistory(); };
+                grid.appendChild(btn);
+            });
+            updatePlayerUrl();
+            const nextEpisode = data.episodes.find(ep => ep.episode_number === activeEpisode + 1);
+            if (nextEpisode && autoplayEnabled) scheduleAutoNext(seasonNum, nextEpisode.episode_number, nextEpisode.name);
         }
 
-        function onSeasonChange() {
-            activeSeason = parseInt(document.getElementById('season-select').value);
-            activeEpisode = 1; 
-            buildEpisodeGrid(activeId, activeSeason);
-        }
-
-        function updatePlayerUrl() {
-            const provider = document.getElementById('provider-select').value;
-            const target = getEmbedUrl(provider, activeType, activeId, activeSeason, activeEpisode);
-            const iframe = document.getElementById('video-iframe');
-            if (iframe.src !== target) iframe.src = target;
+        function onSeasonChange() { activeSeason = parseInt(document.getElementById('season-select').value); activeEpisode = 1; buildEpisodeGrid(activeId, activeSeason); }
+        
+        function updatePlayerUrl() { 
+            currentVideoUrl = getEmbedUrl(document.getElementById('provider-select').value, activeType, activeId, activeSeason, activeEpisode);
+            document.getElementById('video-iframe').src = currentVideoUrl; 
+            recordWatchHistory(); 
         }
 
         function showHome(e) {
             if (e) e.preventDefault();
             document.getElementById('video-iframe').src = "";
+            currentVideoUrl = '';
             document.getElementById('player-view').classList.add('hidden');
             document.getElementById('nav-search-container').classList.add('hidden');
             document.getElementById('home-view').classList.remove('hidden');
@@ -730,55 +695,40 @@
         function syncDashboardUI() {
             const panel = document.getElementById('tracker-dashboard-panel');
             const historyContainer = document.getElementById('panel-history-container');
-            if (!storageAvailable || !panel || !historyContainer) return;
-            let localHistory = [];
-            try { localHistory = JSON.parse(localStorage.getItem('hylton_local_history')) || []; } catch(e) {}
-            if(localHistory.length > 0) {
+            let history = [];
+            try { history = JSON.parse(localStorage.getItem('hylton_local_history')) || []; } catch(e) {}
+            if (history.length > 0) {
                 panel.classList.remove('hidden');
                 historyContainer.innerHTML = '';
-                [...localHistory].reverse().slice(0, 10).forEach(record => {
-                    const cell = document.createElement('div');
-                    cell.className = "flex items-center justify-between text-xs bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-800 rounded px-3 py-2 transition-colors cursor-pointer group";
-                    let runtimeLabel = record.type === 'tv' ? `<span class="text-[10px] uppercase font-mono tracking-wider border border-zinc-700 bg-zinc-900 px-1.5 rounded py-0.5 text-zinc-100 font-bold">S${record.season} E${record.episode}</span>` : `<span class="text-[10px] uppercase font-mono tracking-wider border border-zinc-800 bg-zinc-950 px-1.5 rounded py-0.5 text-zinc-400">Movie</span>`;
-                    cell.innerHTML = `<div class="flex flex-col max-w-[70%]"><span class="font-medium text-zinc-300 group-hover:text-white truncate">${escapeHtml(record.title)}</span><span class="text-[9px] text-zinc-600 mt-0.5">${new Date(record.timestamp).toLocaleDateString()}</span></div>${runtimeLabel}`;
-                    cell.onclick = (e) => { e.stopPropagation(); resumePlaybackFromRecord(record); };
-                    historyContainer.appendChild(cell);
+                history.slice(-5).reverse().forEach(record => {
+                    const div = document.createElement('div');
+                    div.className = "flex items-center justify-between text-xs bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-800 rounded px-3 py-2 cursor-pointer";
+                    div.innerHTML = `<span class="font-medium">${escapeHtml(record.title)}</span><span class="text-zinc-500">${record.type === 'tv' ? `S${record.season}E${record.episode}` : 'Movie'}</span>`;
+                    div.onclick = () => launchPlayer(record.type, record.id, record.title);
+                    historyContainer.appendChild(div);
                 });
             } else { panel.classList.add('hidden'); }
         }
 
         function recordWatchHistory() {
-            if (!storageAvailable) return;
-            let localHistory = JSON.parse(localStorage.getItem('hylton_local_history')) || [];
-            localHistory = localHistory.filter(item => item.id !== activeId.toString());
-            localHistory.push({ id: activeId.toString(), type: activeType, title: activeTitle, season: activeSeason, episode: activeEpisode, timestamp: Date.now() });
-            if (localHistory.length > 50) localHistory = localHistory.slice(-50);
-            localStorage.setItem('hylton_local_history', JSON.stringify(localHistory));
+            let history = [];
+            try { history = JSON.parse(localStorage.getItem('hylton_local_history')) || []; } catch(e) {}
+            history = history.filter(i => i.id !== activeId);
+            history.unshift({ id: activeId, type: activeType, title: activeTitle, season: activeSeason, episode: activeEpisode, timestamp: Date.now() });
+            if (history.length > 20) history = history.slice(0, 20);
+            localStorage.setItem('hylton_local_history', JSON.stringify(history));
         }
 
-        function retrieveSavedProgressMarker() {
-            if (!storageAvailable) return;
-            const localHistory = JSON.parse(localStorage.getItem('hylton_local_history')) || [];
-            const match = localHistory.find(item => item.id === activeId.toString() && item.type === 'tv');
-            if(match) { activeSeason = match.season; activeEpisode = match.episode; }
+        function retrieveSavedProgress() {
+            try {
+                const history = JSON.parse(localStorage.getItem('hylton_local_history')) || [];
+                const match = history.find(i => i.id === activeId && i.type === 'tv');
+                if (match) { activeSeason = match.season; activeEpisode = match.episode; }
+            } catch(e) {}
         }
 
-        function resumePlaybackFromRecord(record) {
-            launchPlayer(record.type, record.id, record.title);
-            if(record.type === 'tv') {
-                activeSeason = record.season;
-                activeEpisode = record.episode;
-                document.getElementById('season-select').value = activeSeason;
-                buildEpisodeGrid(record.id, activeSeason);
-            }
-        }
-
-        function clearDeviceHistory() {
-            if(confirm("Clear your watch history from this device?")) {
-                localStorage.removeItem('hylton_local_history');
-                syncDashboardUI();
-            }
-        }
+        function clearDeviceHistory() { if (confirm("Clear watch history?")) { localStorage.removeItem('hylton_local_history'); syncDashboardUI(); showToast('History cleared'); } }
+        function clearAllData() { if (confirm("Clear ALL data (history, watchlist, favorites)?")) { localStorage.clear(); syncDashboardUI(); updateBadges(); showToast('All data cleared'); } }
     </script>
 </body>
 </html>
