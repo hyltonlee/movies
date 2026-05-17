@@ -121,11 +121,32 @@
                 <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
                     <h2 id="section-title" class="text-lg font-medium tracking-tight">Trending Now</h2>
                     <div class="flex gap-2 text-xs">
-                        <button onclick="fetchTrending('movie')" id="toggle-movie" class="px-3 py-1 rounded bg-zinc-800 text-zinc-100 font-medium">Movies</button>
-                        <button onclick="fetchTrending('tv')" id="toggle-tv" class="px-3 py-1 rounded text-zinc-400 hover:text-zinc-100/85">TV Shows</button>
+                        <button onclick="fetchTrending('movie', true)" id="toggle-movie" class="px-3 py-1 rounded bg-zinc-800 text-zinc-100 font-medium">Movies</button>
+                        <button onclick="fetchTrending('tv', true)" id="toggle-tv" class="px-3 py-1 rounded text-zinc-400 hover:text-zinc-100/85">TV Shows</button>
                     </div>
                 </div>
+
                 <div id="media-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+
+                <div class="flex items-center justify-center gap-3 pt-6">
+                    <button
+                        id="prev-page-btn"
+                        onclick="changeTrendingPage(-1)"
+                        class="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-zinc-100 border border-zinc-800 rounded bg-zinc-900/40">
+                        Prev
+                    </button>
+
+                    <div id="page-indicator" class="text-xs text-zinc-500 font-mono">
+                        Page 1
+                    </div>
+
+                    <button
+                        id="next-page-btn"
+                        onclick="changeTrendingPage(1)"
+                        class="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-zinc-100 border border-zinc-800 rounded bg-zinc-900/40">
+                        Next
+                    </button>
+                </div>
             </div>
         </section>
 
@@ -155,7 +176,6 @@
         </section>
     </main>
 
-    <!-- Settings Modal Layout -->
     <div id="settings-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm">
         <div class="bg-zinc-950 border border-zinc-800 rounded-lg max-w-md w-full shadow-2xl p-6 space-y-6 animate-in fade-in zoom-in-95 duration-150">
             <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
@@ -172,7 +192,6 @@
                 <div class="space-y-1.5">
                     <label for="settings-default-provider" class="text-xs font-medium text-zinc-400">Primary Source</label>
                     <select id="settings-default-provider" class="w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-500 cursor-pointer">
-                        <!-- populated via script -->
                     </select>
                     <p class="text-[11px] text-zinc-500">Choose the source</p>
                 </div>
@@ -212,6 +231,57 @@
         let activeTitle = '';
         let activeSeason = 1;
         let activeEpisode = 1;
+        let trendingPage = 1;
+        let trendingTotalPages = 1;
+        let currentSearchQuery = ''; // Track if we're in search mode
+
+        // Safe localStorage wrapper
+        function safeLocalStorage() {
+            try {
+                const test = '__storage_test__';
+                localStorage.setItem(test, test);
+                localStorage.removeItem(test);
+                return true;
+            } catch (e) {
+                console.warn('localStorage not available:', e.message);
+                return false;
+            }
+        }
+
+        const storageAvailable = safeLocalStorage();
+
+        function getItem(key, defaultValue = null) {
+            if (!storageAvailable) return defaultValue;
+            try {
+                const value = localStorage.getItem(key);
+                return value !== null ? value : defaultValue;
+            } catch (e) {
+                console.warn('Failed to read from localStorage:', e.message);
+                return defaultValue;
+            }
+        }
+
+        function setItem(key, value) {
+            if (!storageAvailable) return false;
+            try {
+                localStorage.setItem(key, value);
+                return true;
+            } catch (e) {
+                console.warn('Failed to write to localStorage:', e.message);
+                return false;
+            }
+        }
+
+        function removeItem(key) {
+            if (!storageAvailable) return false;
+            try {
+                localStorage.removeItem(key);
+                return true;
+            } catch (e) {
+                console.warn('Failed to remove from localStorage:', e.message);
+                return false;
+            }
+        }
 
         function getEmbedUrl(provider, type, id, s = 1, e = 1) {
             switch(provider) {
@@ -265,13 +335,44 @@
             }
         }
 
+        function setPageIndicator() {
+            const pageIndicator = document.getElementById('page-indicator');
+            const prevBtn = document.getElementById('prev-page-btn');
+            const nextBtn = document.getElementById('next-page-btn');
+
+            if (pageIndicator) pageIndicator.innerText = `Page ${trendingPage} of ${trendingTotalPages}`;
+            if (prevBtn) {
+                prevBtn.disabled = trendingPage <= 1;
+                prevBtn.classList.toggle('opacity-50', trendingPage <= 1);
+                prevBtn.classList.toggle('cursor-not-allowed', trendingPage <= 1);
+            }
+            if (nextBtn) {
+                nextBtn.disabled = trendingPage >= trendingTotalPages;
+                nextBtn.classList.toggle('opacity-50', trendingPage >= trendingTotalPages);
+                nextBtn.classList.toggle('cursor-not-allowed', trendingPage >= trendingTotalPages);
+            }
+        }
+
+        async function changeTrendingPage(delta) {
+            // Don't change page if we're in search mode
+            if (currentSearchQuery) return;
+            
+            const newPage = trendingPage + delta;
+            if (newPage < 1 || newPage > trendingTotalPages) return;
+            trendingPage = newPage;
+            await fetchTrending(activeType, false);
+            setPageIndicator();
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             initializePreferences();
-            fetchTrending('movie');
+            fetchTrending('movie', true);
             syncDashboardUI();
             
             const handleSearch = async (e) => {
                 const query = e.target.value.trim();
+                currentSearchQuery = query;
+                
                 if (query.length > 2) {
                     try {
                         const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
@@ -279,34 +380,51 @@
                         const filtered = data.results.filter(i => i.media_type === 'movie' || i.media_type === 'tv');
                         document.getElementById('section-title').innerText = `Search results for: "${query}"`;
                         renderGrid(filtered, null);
+                        // Hide pagination when searching
+                        document.getElementById('prev-page-btn').style.display = 'none';
+                        document.getElementById('next-page-btn').style.display = 'none';
+                        document.getElementById('page-indicator').style.display = 'none';
                     } catch (err) {
-                        console.error(err);
+                        console.error('Search failed:', err);
+                        document.getElementById('media-grid').innerHTML = '<div class="col-span-full text-center text-zinc-500 py-12 text-sm">Search failed. Please try again.</div>';
                     }
                 } else if (query.length === 0) {
-                    fetchTrending(activeType);
+                    // Show pagination again
+                    document.getElementById('prev-page-btn').style.display = 'flex';
+                    document.getElementById('next-page-btn').style.display = 'flex';
+                    document.getElementById('page-indicator').style.display = 'flex';
+                    trendingPage = 1;
+                    await fetchTrending(activeType, true);
+                    setPageIndicator();
                 }
             };
 
-            document.getElementById('hero-search-input').addEventListener('input', handleSearch);
-            document.getElementById('nav-search-input').addEventListener('input', handleSearch);
+            const heroSearch = document.getElementById('hero-search-input');
+            const navSearch = document.getElementById('nav-search-input');
+            if (heroSearch) heroSearch.addEventListener('input', handleSearch);
+            if (navSearch) navSearch.addEventListener('input', handleSearch);
         });
 
         function initializePreferences() {
-            const savedProvider = localStorage.getItem('hylton_preferred_provider') || 'vidkingnet';
+            const savedProvider = getItem('hylton_preferred_provider', 'vidkingnet');
             
             const mainSelect = document.getElementById('provider-select');
-            mainSelect.value = savedProvider;
+            if (mainSelect) mainSelect.value = savedProvider;
 
             const modalSelect = document.getElementById('settings-default-provider');
-            modalSelect.innerHTML = mainSelect.innerHTML;
-            modalSelect.value = savedProvider;
+            if (modalSelect && mainSelect) {
+                modalSelect.innerHTML = mainSelect.innerHTML;
+                modalSelect.value = savedProvider;
+            }
         }
 
         function toggleSettingsModal() {
             const modal = document.getElementById('settings-modal');
+            if (!modal) return;
             if (modal.classList.contains('hidden')) {
-                const currentProvider = localStorage.getItem('hylton_preferred_provider') || 'vidkingnet';
-                document.getElementById('settings-default-provider').value = currentProvider;
+                const currentProvider = getItem('hylton_preferred_provider', 'vidkingnet');
+                const modalSelect = document.getElementById('settings-default-provider');
+                if (modalSelect) modalSelect.value = currentProvider;
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
             } else {
@@ -316,48 +434,69 @@
         }
 
         function saveClientSettings() {
-            const selected = document.getElementById('settings-default-provider').value;
-            localStorage.setItem('hylton_preferred_provider', selected);
-            document.getElementById('provider-select').value = selected;
-            
-            if (!document.getElementById('player-view').classList.contains('hidden')) {
-                updatePlayerUrl();
+            const selected = document.getElementById('settings-default-provider')?.value;
+            if (selected) {
+                setItem('hylton_preferred_provider', selected);
+                const mainSelect = document.getElementById('provider-select');
+                if (mainSelect) mainSelect.value = selected;
+                
+                if (!document.getElementById('player-view')?.classList.contains('hidden')) {
+                    updatePlayerUrl();
+                }
             }
             toggleSettingsModal();
         }
 
         function onProviderChange() {
-            const selected = document.getElementById('provider-select').value;
-            localStorage.setItem('hylton_preferred_provider', selected);
-            updatePlayerUrl();
+            const selected = document.getElementById('provider-select')?.value;
+            if (selected) {
+                setItem('hylton_preferred_provider', selected);
+                updatePlayerUrl();
+            }
         }
 
-        async function fetchTrending(type) {
+        async function fetchTrending(type, resetPage = false) {
             activeType = type;
+
             const movieBtn = document.getElementById('toggle-movie');
             const tvBtn = document.getElementById('toggle-tv');
+            const sectionTitle = document.getElementById('section-title');
             
             if (type === 'movie') {
-                movieBtn.className = "px-3 py-1 rounded bg-zinc-800 text-zinc-100 font-medium";
-                tvBtn.className = "px-3 py-1 rounded text-zinc-400 hover:text-zinc-100";
-                document.getElementById('section-title').innerText = "Trending Movies";
+                if (movieBtn) movieBtn.className = "px-3 py-1 rounded bg-zinc-800 text-zinc-100 font-medium";
+                if (tvBtn) tvBtn.className = "px-3 py-1 rounded text-zinc-400 hover:text-zinc-100";
+                if (sectionTitle) sectionTitle.innerText = "Trending Movies";
             } else {
-                tvBtn.className = "px-3 py-1 rounded bg-zinc-800 text-zinc-100 font-medium";
-                movieBtn.className = "px-3 py-1 rounded text-zinc-400 hover:text-zinc-100";
-                document.getElementById('section-title').innerText = "Trending TV Series";
+                if (tvBtn) tvBtn.className = "px-3 py-1 rounded bg-zinc-800 text-zinc-100 font-medium";
+                if (movieBtn) movieBtn.className = "px-3 py-1 rounded text-zinc-400 hover:text-zinc-100";
+                if (sectionTitle) sectionTitle.innerText = "Trending TV Series";
+            }
+
+            // Reset to page 1 only when switching categories or explicitly requested
+            if (resetPage) {
+                trendingPage = 1;
             }
 
             try {
-                const res = await fetch(`${BASE_URL}/trending/${type}/week?api_key=${API_KEY}`);
+                const res = await fetch(`${BASE_URL}/trending/${type}/week?api_key=${API_KEY}&page=${trendingPage}`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
+
+                trendingTotalPages = Math.min(data.total_pages || 1, 500); // TMDB limits to 500 pages
+                setPageIndicator();
                 renderGrid(data.results, type);
             } catch (err) {
-                console.error(err);
+                console.error('Fetch trending failed:', err);
+                const grid = document.getElementById('media-grid');
+                if (grid) {
+                    grid.innerHTML = '<div class="col-span-full text-center text-zinc-500 py-12 text-sm">Failed to load content. Please check your internet connection.</div>';
+                }
             }
         }
 
         function renderGrid(items, forceType) {
             const grid = document.getElementById('media-grid');
+            if (!grid) return;
             grid.innerHTML = '';
 
             if (!items || items.length === 0) {
@@ -369,7 +508,9 @@
                 const type = forceType || item.media_type;
                 const title = item.title || item.name;
                 const year = (item.release_date || item.first_air_date || '').split('-')[0] || 'N/A';
-                const poster = item.poster_path ? `${IMAGE_URL}${item.poster_path}` : 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?q=80&w=342&auto=format&fit=crop';
+                const poster = item.poster_path
+                    ? `${IMAGE_URL}${item.poster_path}`
+                    : 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?q=80&w=342&auto=format&fit=crop';
 
                 const card = document.createElement('div');
                 card.className = "group cursor-pointer space-y-2 relative";
@@ -385,7 +526,7 @@
                         </div>
                     </div>
                     <div class="space-y-0.5 px-1">
-                        <h3 class="text-xs font-medium text-zinc-200 line-clamp-1 group-hover:text-white transition-colors tracking-tight">${title}</h3>
+                        <h3 class="text-xs font-medium text-zinc-200 line-clamp-1 group-hover:text-white transition-colors tracking-tight">${escapeHtml(title)}</h3>
                         <div class="flex items-center justify-between text-[10px] text-zinc-500 font-mono">
                             <span>${year}</span>
                             <span class="uppercase border border-zinc-800 px-1 rounded bg-zinc-900">${type}</span>
@@ -396,6 +537,16 @@
             });
         }
 
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
         async function launchPlayer(type, id, title = '') {
             activeType = type;
             activeId = id;
@@ -403,37 +554,45 @@
             activeSeason = 1;
             activeEpisode = 1;
             
-            document.getElementById('home-view').classList.add('hidden');
-            document.getElementById('player-view').classList.remove('hidden');
-            document.getElementById('nav-search-container').classList.remove('hidden');
+            const homeView = document.getElementById('home-view');
+            const playerView = document.getElementById('player-view');
+            const navSearch = document.getElementById('nav-search-container');
+            
+            if (homeView) homeView.classList.add('hidden');
+            if (playerView) playerView.classList.remove('hidden');
+            if (navSearch) navSearch.classList.remove('hidden');
             
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
             if (type === 'tv') {
-                document.getElementById('tv-controls').classList.remove('hidden');
+                const tvControls = document.getElementById('tv-controls');
+                if (tvControls) tvControls.classList.remove('hidden');
                 try {
                     const res = await fetch(`${BASE_URL}/tv/${id}?api_key=${API_KEY}`);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
                     const data = await res.json();
                     activeTitle = data.name;
                     
                     retrieveSavedProgressMarker();
 
                     const selector = document.getElementById('season-select');
-                    selector.innerHTML = '';
-                    
-                    for (let i = 1; i <= data.number_of_seasons; i++) {
-                        const opt = document.createElement('option');
-                        opt.value = i;
-                        opt.innerText = `Season ${i}`;
-                        if(i === activeSeason) opt.selected = true;
-                        selector.appendChild(opt);
+                    if (selector) {
+                        selector.innerHTML = '';
+                        for (let i = 1; i <= data.number_of_seasons; i++) {
+                            const opt = document.createElement('option');
+                            opt.value = i;
+                            opt.innerText = `Season ${i}`;
+                            if(i === activeSeason) opt.selected = true;
+                            selector.appendChild(opt);
+                        }
                     }
                     await buildEpisodeGrid(id, activeSeason);
                 } catch(err) {
-                    console.error(err);
+                    console.error('Failed to load TV show details:', err);
                 }
             } else {
-                document.getElementById('tv-controls').classList.add('hidden');
+                const tvControls = document.getElementById('tv-controls');
+                if (tvControls) tvControls.classList.add('hidden');
                 updatePlayerUrl();
                 recordWatchHistory();
             }
@@ -442,8 +601,10 @@
         async function buildEpisodeGrid(id, seasonNum) {
             try {
                 const res = await fetch(`${BASE_URL}/tv/${id}/season/${seasonNum}?api_key=${API_KEY}`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
                 const grid = document.getElementById('episode-grid');
+                if (!grid) return;
                 grid.innerHTML = '';
 
                 data.episodes.forEach(ep => {
@@ -458,6 +619,7 @@
                         activeSeason = seasonNum;
                         activeEpisode = ep.episode_number;
                         buildEpisodeGrid(activeId, activeSeason);
+                        updatePlayerUrl();
                         recordWatchHistory();
                     };
                     grid.appendChild(btn);
@@ -465,47 +627,77 @@
 
                 updatePlayerUrl();
             } catch(err) {
-                console.error(err);
+                console.error('Failed to load episodes:', err);
             }
         }
 
         function onSeasonChange() {
-            activeSeason = parseInt(document.getElementById('season-select').value);
-            activeEpisode = 1; 
-            buildEpisodeGrid(activeId, activeSeason);
+            const seasonSelect = document.getElementById('season-select');
+            if (seasonSelect) {
+                activeSeason = parseInt(seasonSelect.value);
+                activeEpisode = 1; 
+                buildEpisodeGrid(activeId, activeSeason);
+            }
         }
 
         function updatePlayerUrl() {
-            const provider = document.getElementById('provider-select').value;
+            const provider = document.getElementById('provider-select')?.value || 'vidkingnet';
             const target = getEmbedUrl(provider, activeType, activeId, activeSeason, activeEpisode);
             const iframe = document.getElementById('video-iframe');
-            if (iframe.src !== target) {
+            if (iframe && iframe.src !== target) {
                 iframe.src = target;
             }
         }
 
         function showHome(e) {
             if (e) e.preventDefault();
-            document.getElementById('video-iframe').src = ""; 
-            document.getElementById('player-view').classList.add('hidden');
-            document.getElementById('nav-search-container').classList.add('hidden');
-            document.getElementById('home-view').classList.remove('hidden');
-            document.getElementById('hero-search-input').value = "";
-            document.getElementById('nav-search-input').value = "";
+            const iframe = document.getElementById('video-iframe');
+            if (iframe) iframe.src = ""; 
+            const playerView = document.getElementById('player-view');
+            const navSearch = document.getElementById('nav-search-container');
+            const homeView = document.getElementById('home-view');
+            
+            if (playerView) playerView.classList.add('hidden');
+            if (navSearch) navSearch.classList.add('hidden');
+            if (homeView) homeView.classList.remove('hidden');
+            
+            const heroSearch = document.getElementById('hero-search-input');
+            const navSearchInput = document.getElementById('nav-search-input');
+            if (heroSearch) heroSearch.value = "";
+            if (navSearchInput) navSearchInput.value = "";
+            
+            // Reset search query and show pagination
+            currentSearchQuery = '';
+            document.getElementById('prev-page-btn').style.display = 'flex';
+            document.getElementById('next-page-btn').style.display = 'flex';
+            document.getElementById('page-indicator').style.display = 'flex';
+            
             syncDashboardUI();
-            fetchTrending(activeType);
+            trendingPage = 1;
+            fetchTrending(activeType, true);
+            setPageIndicator();
         }
 
         function syncDashboardUI() {
             const panel = document.getElementById('tracker-dashboard-panel');
             const historyContainer = document.getElementById('panel-history-container');
-            const localHistory = JSON.parse(localStorage.getItem('hylton_local_history')) || [];
+            
+            if (!storageAvailable || !panel || !historyContainer) return;
+            
+            let localHistory = [];
+            try {
+                const raw = localStorage.getItem('hylton_local_history');
+                localHistory = raw ? JSON.parse(raw) : [];
+            } catch (e) {
+                console.warn('Failed to parse history:', e);
+                localHistory = [];
+            }
 
             if(localHistory.length > 0) {
                 panel.classList.remove('hidden');
                 historyContainer.innerHTML = '';
                 
-                [...localHistory].reverse().forEach(record => {
+                [...localHistory].reverse().slice(0, 10).forEach(record => {
                     const cell = document.createElement('div');
                     cell.className = "flex items-center justify-between text-xs bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-800 rounded px-3 py-2 transition-colors cursor-pointer group";
                     
@@ -516,8 +708,8 @@
 
                     cell.innerHTML = `
                         <div class="flex flex-col max-w-[70%]">
-                            <span class="font-medium text-zinc-300 group-hover:text-white line-clamp-1 truncate">${record.title}</span>
-                            <span class="text-[9px] font-mono text-zinc-600 mt-0.5">${new Date(record.timestamp).toLocaleDateString()}</span>
+                            <span class="font-medium text-zinc-300 group-hover:text-white line-clamp-1 truncate">${escapeHtml(record.title || 'Unknown')}</span>
+                            <span class="text-[9px] font-mono text-zinc-600 mt-0.5">${record.timestamp ? new Date(record.timestamp).toLocaleDateString() : 'Unknown date'}</span>
                         </div>
                         <div class="flex items-center gap-2">
                             ${runtimeLabel}
@@ -536,7 +728,16 @@
         }
 
         function recordWatchHistory() {
-            let localHistory = JSON.parse(localStorage.getItem('hylton_local_history')) || [];
+            if (!storageAvailable) return;
+            
+            let localHistory = [];
+            try {
+                const raw = localStorage.getItem('hylton_local_history');
+                localHistory = raw ? JSON.parse(raw) : [];
+            } catch (e) {
+                console.warn('Failed to parse history:', e);
+            }
+            
             localHistory = localHistory.filter(item => item.id !== activeId.toString());
 
             const historyItem = {
@@ -549,16 +750,29 @@
             };
 
             localHistory.push(historyItem);
-            localStorage.setItem('hylton_local_history', JSON.stringify(localHistory));
+            if (localHistory.length > 50) localHistory = localHistory.slice(-50);
+            
+            try {
+                localStorage.setItem('hylton_local_history', JSON.stringify(localHistory));
+            } catch (e) {
+                console.warn('Failed to save history:', e);
+            }
         }
 
         function retrieveSavedProgressMarker() {
-            const localHistory = JSON.parse(localStorage.getItem('hylton_local_history')) || [];
-            const matchingRecord = localHistory.find(item => item.id === activeId.toString() && item.type === 'tv');
+            if (!storageAvailable) return;
             
-            if(matchingRecord) {
-                activeSeason = parseInt(matchingRecord.season) || 1;
-                activeEpisode = parseInt(matchingRecord.episode) || 1;
+            try {
+                const raw = localStorage.getItem('hylton_local_history');
+                const localHistory = raw ? JSON.parse(raw) : [];
+                const matchingRecord = localHistory.find(item => item.id === activeId.toString() && item.type === 'tv');
+                
+                if(matchingRecord) {
+                    activeSeason = parseInt(matchingRecord.season) || 1;
+                    activeEpisode = parseInt(matchingRecord.episode) || 1;
+                }
+            } catch (e) {
+                console.warn('Failed to retrieve progress:', e);
             }
         }
 
@@ -575,7 +789,7 @@
 
         function clearDeviceHistory() {
             if(confirm("Clear your watch history from this device?")) {
-                localStorage.removeItem('hylton_local_history');
+                removeItem('hylton_local_history');
                 syncDashboardUI();
             }
         }
