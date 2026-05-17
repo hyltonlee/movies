@@ -49,7 +49,7 @@
                 <div id="header-provider-container" class="flex items-center gap-2">
                     <select id="provider-select" onchange="onProviderChange()" 
                         class="bg-zinc-900 border border-zinc-800 rounded px-2 py-1 text-xs text-zinc-300 focus:outline-none focus:border-zinc-500 cursor-pointer">
-                        <option value="vidking" selected>Vidking (.net)</option>
+                        <option value="vidkingnet" selected>VidKing.net</option>
                         <option value="vidlink">VidLink.pro</option>
                         <option value="vidsrccc">VidSrc.cc</option>
                         <option value="vidsrcto">VidSrc.to</option>
@@ -215,7 +215,7 @@
 
         function getEmbedUrl(provider, type, id, s = 1, e = 1) {
             switch(provider) {
-                case 'vidking':   
+                case 'vidkingnet':
                     return type === 'movie' ? `https://vidking.net/embed/movie/${id}` : `https://vidking.net/embed/tv/${id}/${s}/${e}`;
                 case 'vidlink':
                     return type === 'movie' ? `https://vidlink.pro/movie/${id}` : `https://vidlink.pro/tv/${id}/${s}/${e}`;
@@ -292,7 +292,7 @@
         });
 
         function initializePreferences() {
-            const savedProvider = localStorage.getItem('hylton_preferred_provider') || 'vidking';
+            const savedProvider = localStorage.getItem('hylton_preferred_provider') || 'vidkingnet';
             
             const mainSelect = document.getElementById('provider-select');
             mainSelect.value = savedProvider;
@@ -305,7 +305,7 @@
         function toggleSettingsModal() {
             const modal = document.getElementById('settings-modal');
             if (modal.classList.contains('hidden')) {
-                const currentProvider = localStorage.getItem('hylton_preferred_provider') || 'vidking';
+                const currentProvider = localStorage.getItem('hylton_preferred_provider') || 'vidkingnet';
                 document.getElementById('settings-default-provider').value = currentProvider;
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
