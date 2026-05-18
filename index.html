@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>hylton - Ultimate Streaming Hub</title>
+    <title>hylton</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -11,7 +11,7 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Aileron', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
                     }
                 }
             }
@@ -19,7 +19,7 @@
     </script>
     <style>
         body {
-            font-family: 'Aileron', 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background-color: #09090b;
             color: #fafafa;
         }
@@ -50,6 +50,76 @@
             z-index: 1000;
             animation: slideUp 0.3s ease-out;
         }
+        .provider-check {
+            transition: all 0.2s ease;
+        }
+        .provider-check:hover {
+            transform: translateY(-1px);
+        }
+        /* Shadcn style select */
+        .shadcn-select {
+            background-color: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 0.5rem;
+            padding: 0.25rem 2rem 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            color: #e4e4e7;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .shadcn-select:hover {
+            border-color: #3f3f46;
+        }
+        .shadcn-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            ring: 2px solid #3b82f6;
+        }
+        /* Shadcn modal */
+        .shadcn-modal {
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 0.75rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        .shadcn-button {
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .shadcn-button:hover {
+            background: #27272a;
+            border-color: #3f3f46;
+        }
+        .shadcn-button-primary {
+            background: #fafafa;
+            color: #09090b;
+            border: none;
+        }
+        .shadcn-button-primary:hover {
+            background: #e4e4e7;
+        }
+        .shadcn-input {
+            background: #09090b;
+            border: 1px solid #27272a;
+            border-radius: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        .shadcn-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            ring: 2px solid #3b82f6;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-zinc-800 selection:text-zinc-100">
@@ -61,7 +131,7 @@
             <div id="nav-search-container" class="hidden w-full max-w-sm mx-auto">
                 <div class="relative">
                     <input type="text" id="nav-search-input" placeholder="Search movies or TV shows..." 
-                        class="w-full h-9 bg-zinc-900 border border-zinc-800 rounded-md pl-9 pr-4 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400">
+                        class="w-full h-9 bg-zinc-900 border border-zinc-800 rounded-lg pl-9 pr-4 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400">
                     <div class="absolute left-3 top-2.5 text-zinc-500">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                     </div>
@@ -78,8 +148,7 @@
                     <span id="favorites-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
                 </button>
                 <div id="header-provider-container" class="flex items-center gap-2">
-                    <select id="provider-select" onchange="onProviderChange()" 
-                        class="bg-zinc-900 border border-zinc-800 rounded px-2 py-1 text-xs text-zinc-300 focus:outline-none focus:border-zinc-500 cursor-pointer">
+                    <select id="provider-select" onchange="onProviderChange()" class="shadcn-select">
                         <option value="vidkingnet" selected>VidKing.net</option>
                         <option value="vidlink">VidLink.pro</option>
                         <option value="vidsrccc">VidSrc.cc</option>
@@ -118,8 +187,8 @@
             <div class="text-center max-w-lg mx-auto space-y-2 pt-4">
                 <h1 class="text-2xl font-semibold tracking-tight text-zinc-100">What are we watching today?</h1>
                 <div class="relative">
-                    <input type="text" id="hero-search-input" placeholder="Search titles..." 
-                        class="w-full h-11 bg-zinc-900 border border-zinc-800 rounded-md pl-10 pr-4 text-base text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 shadow-xl">
+                    <input type="text" id="hero-search-input" placeholder="Search movies or TV shows..." 
+                        class="w-full h-11 bg-zinc-900 border border-zinc-800 rounded-lg pl-10 pr-4 text-base text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 shadow-xl">
                     <div class="absolute left-3.5 top-[14px] text-zinc-500">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                     </div>
@@ -207,8 +276,29 @@
         </section>
     </main>
 
+    <!-- Provider Check Modal -->
+    <div id="provider-check-modal" class="fixed inset-0 z-[200] hidden items-center justify-center p-4 bg-black/95 backdrop-blur-md overflow-y-auto">
+        <div class="max-w-2xl w-full mx-auto animate-slideUp">
+            <div class="bg-zinc-950 rounded-xl border border-zinc-800 overflow-hidden shadow-2xl">
+                <div class="p-6 border-b border-zinc-800 flex justify-between items-center">
+                    <div>
+                        <h3 class="text-lg font-semibold text-zinc-100">Provider Availability Check</h3>
+                        <p id="provider-check-title" class="text-sm text-zinc-400 mt-1"></p>
+                    </div>
+                    <button onclick="closeProviderCheckModal()" class="text-zinc-400 hover:text-zinc-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+                <div id="provider-list" class="p-6 space-y-2 max-h-96 overflow-y-auto"></div>
+                <div class="p-6 border-t border-zinc-800 flex justify-end">
+                    <button onclick="closeProviderCheckModal()" class="px-4 py-2 bg-zinc-800 text-zinc-300 rounded-lg hover:bg-zinc-700">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Detailed Info Modal -->
-    <div id="detail-modal" class="fixed inset-0 z-[200] hidden items-center justify-center p-4 bg-black/90 backdrop-blur-md overflow-y-auto">
+    <div id="detail-modal" class="fixed inset-0 z-[150] hidden items-center justify-center p-4 bg-black/90 backdrop-blur-md overflow-y-auto">
         <div class="max-w-4xl w-full mx-auto animate-slideUp">
             <div class="bg-gradient-to-b from-zinc-900 to-zinc-950 rounded-xl border border-zinc-800 overflow-hidden shadow-2xl">
                 <div id="modal-backdrop" class="relative h-64 md:h-96 bg-cover bg-center" style="background-image: url('');">
@@ -246,6 +336,7 @@
                             <div><h3 class="text-sm font-semibold text-zinc-300 mb-2">Overview</h3><p id="modal-overview" class="text-sm text-zinc-400 leading-relaxed"></p></div>
                             <div class="flex gap-3 pt-4">
                                 <button id="modal-watch-btn" class="flex-1 bg-zinc-100 text-zinc-950 px-4 py-2 rounded-lg font-semibold hover:bg-zinc-200 transition-colors flex items-center justify-center gap-2">Play Now</button>
+                                <button id="modal-check-providers" onclick="checkProviderAvailability()" class="px-4 py-2 rounded-lg border border-zinc-700 text-zinc-400 hover:text-green-500 transition-colors">Check Providers</button>
                                 <button id="modal-watchlist-btn" onclick="toggleBookmarkFromModal()" class="px-4 py-2 rounded-lg border border-zinc-700 text-zinc-400 hover:text-yellow-500 transition-colors">Watchlist</button>
                                 <button id="modal-favorite-btn" onclick="toggleFavoriteFromModal()" class="px-4 py-2 rounded-lg border border-zinc-700 text-zinc-400 hover:text-red-500 transition-colors">Favorite</button>
                                 <button onclick="closeDetailModal()" class="px-4 py-2 rounded-lg border border-zinc-700 text-zinc-400 hover:text-zinc-200">Close</button>
@@ -257,19 +348,38 @@
         </div>
     </div>
 
-    <div id="settings-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm">
-        <div class="bg-zinc-950 border border-zinc-800 rounded-lg max-w-md w-full shadow-2xl p-6 space-y-6">
-            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
-                <h3 class="text-base font-semibold tracking-tight text-zinc-100">Settings</h3>
-                <button onclick="toggleSettingsModal()" class="text-zinc-500 hover:text-zinc-300">Close</button>
+    <!-- Settings Modal - Shadcn styled -->
+    <div id="settings-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="shadcn-modal max-w-md w-full p-6 space-y-5">
+            <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+                <h3 class="text-base font-semibold text-zinc-100">Settings</h3>
+                <button onclick="toggleSettingsModal()" class="text-zinc-500 hover:text-zinc-300 transition">✕</button>
             </div>
             <div class="space-y-4">
-                <div><label class="text-xs font-medium text-zinc-400">Primary Source</label><select id="settings-default-provider" class="w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 text-sm mt-1"></select></div>
-                <div><label class="flex items-center gap-2 text-xs font-medium text-zinc-400"><input type="checkbox" id="settings-autoplay" onchange="setAutoplaySetting()"> Auto-play Next Episode</label></div>
-                <div><label class="flex items-center gap-2 text-xs font-medium text-zinc-400"><input type="checkbox" id="settings-autonext" onchange="setAutoNextSetting()"> Auto-Next Episode (5s countdown)</label></div>
-                <div class="pt-2 border-t border-zinc-800"><button onclick="clearAllData()" class="text-xs font-medium text-red-400 hover:text-red-300">Clear All Cache & History</button></div>
+                <div>
+                    <label class="text-xs font-medium text-zinc-400 block mb-1.5">Primary Source</label>
+                    <select id="settings-default-provider" class="shadcn-select w-full text-sm py-2"></select>
+                </div>
+                <div class="flex items-center justify-between py-1">
+                    <label class="text-sm text-zinc-300">Auto-play Next Episode</label>
+                    <input type="checkbox" id="settings-autoplay" onchange="setAutoplaySetting()" class="w-4 h-4 rounded border-zinc-600 bg-zinc-900 accent-zinc-100">
+                </div>
+                <div class="flex items-center justify-between py-1">
+                    <label class="text-sm text-zinc-300">Auto-Next Episode (5s countdown)</label>
+                    <input type="checkbox" id="settings-autonext" onchange="setAutoNextSetting()" class="w-4 h-4 rounded border-zinc-600 bg-zinc-900 accent-zinc-100">
+                </div>
+                <div class="flex items-center justify-between py-1">
+                    <label class="text-sm text-zinc-300">Smart Title Matching</label>
+                    <input type="checkbox" id="settings-smart-match" onchange="setSmartMatchSetting()" checked class="w-4 h-4 rounded border-zinc-600 bg-zinc-900 accent-zinc-100">
+                </div>
+                <div class="pt-3 border-t border-zinc-800">
+                    <button onclick="clearAllData()" class="w-full py-2 text-sm font-medium text-red-400 hover:text-red-300 border border-red-800/30 hover:border-red-700 rounded-lg bg-red-950/20 transition-colors">Clear All Cache & History</button>
+                </div>
             </div>
-            <div class="flex justify-end"><button onclick="saveClientSettings()" class="px-3 py-1.5 text-xs font-medium bg-zinc-100 text-zinc-950 rounded">Save</button></div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="toggleSettingsModal()" class="shadcn-button text-sm">Cancel</button>
+                <button onclick="saveClientSettings()" class="shadcn-button-primary px-4 py-2 rounded-lg text-sm font-medium">Save</button>
+            </div>
         </div>
     </div>
 
@@ -287,10 +397,87 @@
 
         let activeType = 'movie', activeId = '', activeTitle = '', activeSeason = 1, activeEpisode = 1;
         let trendingPage = 1, trendingTotalPages = 1, currentSearchQuery = '';
-        let autoplayEnabled = true, autoNextEnabled = true;
+        let autoplayEnabled = true, autoNextEnabled = true, smartMatchEnabled = true;
         let autoNextTimer = null, upnextData = null;
         let currentMediaData = null;
         let currentVideoUrl = '';
+
+        const providers = [
+            { id: 'vidkingnet', name: 'VidKing.net', url: (type, id, s, e) => type === 'movie' ? `https://vidking.net/embed/movie/${id}` : `https://vidking.net/embed/tv/${id}/${s}/${e}` },
+            { id: 'vidlink', name: 'VidLink.pro', url: (type, id, s, e) => type === 'movie' ? `https://vidlink.pro/movie/${id}` : `https://vidlink.pro/tv/${id}/${s}/${e}` },
+            { id: 'vidsrcto', name: 'VidSrc.to', url: (type, id, s, e) => type === 'movie' ? `https://vidsrc.to/embed/movie/${id}` : `https://vidsrc.to/embed/tv/${id}/${s}/${e}` },
+            { id: 'vidsrccc', name: 'VidSrc.cc', url: (type, id, s, e) => type === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}` },
+            { id: 'vidsrcme', name: 'VidSrc.me', url: (type, id, s, e) => type === 'movie' ? `https://vidsrc.me/embed/movie?tmdb=${id}` : `https://vidsrc.me/embed/tv?tmdb=${id}&sea=${s}&epi=${e}` },
+            { id: 'autoembed', name: 'AutoEmbed', url: (type, id, s, e) => type === 'movie' ? `https://player.autoembed.to/movie/${id}` : `https://player.autoembed.to/tv/${id}/${s}/${e}` },
+            { id: 'twoembed', name: '2Embed', url: (type, id, s, e) => type === 'movie' ? `https://www.2embed.cc/embed/${id}` : `https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}` },
+            { id: 'embedsu', name: 'Embed.su', url: (type, id, s, e) => type === 'movie' ? `https://embed.su/embed/movie/${id}` : `https://embed.su/embed/tv/${id}/${s}/${e}` },
+            { id: 'superembed', name: 'SuperEmbed', url: (type, id, s, e) => type === 'movie' ? `https://multiembed.mov/?video_id=${id}&tmdb=1` : `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}` },
+            { id: 'smashy', name: 'Smashy Stream', url: (type, id, s, e) => type === 'movie' ? `https://embed.smashystream.com/playere.php?tmdb=${id}` : `https://embed.smashystream.com/playere.php?tmdb=${id}&season=${s}&episode=${e}` }
+        ];
+
+        // SIMPLE SEARCH - like before, just fix Invincible
+        async function simpleSearch(query) {
+            const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
+            const data = await res.json();
+            let results = data.results.filter(i => i.media_type === 'movie' || i.media_type === 'tv');
+            
+            // Fix for Invincible - prioritize the 2021 animated series
+            if (query.toLowerCase() === 'invincible') {
+                const invincibleShows = results.filter(r => 
+                    (r.title || r.name || '').toLowerCase() === 'invincible' && 
+                    (r.media_type === 'tv' || parseInt(r.release_date || r.first_air_date || '0') >= 2020)
+                );
+                if (invincibleShows.length > 0) {
+                    results = invincibleShows;
+                }
+                // Sort by year (newest first) and TV shows first
+                results.sort((a, b) => {
+                    const aYear = parseInt(a.release_date || a.first_air_date || '0');
+                    const bYear = parseInt(b.release_date || b.first_air_date || '0');
+                    if (a.media_type === 'tv' && b.media_type !== 'tv') return -1;
+                    if (b.media_type === 'tv' && a.media_type !== 'tv') return 1;
+                    return bYear - aYear;
+                });
+            }
+            
+            return results;
+        }
+
+        function checkProviderAvailability() {
+            if (!currentMediaData) return;
+            const modal = document.getElementById('provider-check-modal');
+            const providerList = document.getElementById('provider-list');
+            const titleSpan = document.getElementById('provider-check-title');
+            titleSpan.innerText = `${currentMediaData.title} - Checking availability...`;
+            providerList.innerHTML = '<div class="text-center text-zinc-400 py-4">Checking providers...</div>';
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            const results = [];
+            providers.forEach(provider => {
+                const testUrl = provider.url(activeType, currentMediaData.id, activeSeason, activeEpisode);
+                results.push({ provider: provider.name, url: testUrl, status: 'unknown', statusText: 'Click to test' });
+            });
+            
+            providerList.innerHTML = '';
+            results.forEach(result => {
+                const div = document.createElement('div');
+                div.className = 'provider-check flex items-center justify-between p-3 bg-zinc-900 rounded-lg border border-zinc-800';
+                div.innerHTML = `<div><span class="font-medium text-zinc-200">${result.provider}</span><span class="text-xs text-yellow-500 ml-2">${result.statusText}</span></div><button onclick="testProviderDirect('${result.url}', '${result.provider}')" class="text-xs px-3 py-1 bg-zinc-800 text-zinc-300 rounded hover:bg-zinc-700">Test</button>`;
+                providerList.appendChild(div);
+            });
+            titleSpan.innerText = `${currentMediaData.title} - Provider Status`;
+        }
+        
+        function testProviderDirect(url, providerName) {
+            window.open(url, '_blank');
+            showToast(`Opening ${providerName} in new tab`, 'info');
+        }
+        
+        function closeProviderCheckModal() {
+            document.getElementById('provider-check-modal').classList.add('hidden');
+            document.getElementById('provider-check-modal').classList.remove('flex');
+        }
 
         function showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
@@ -303,7 +490,6 @@
         const storageAvailable = safeLocalStorage();
         function getItem(key, defaultValue = null) { if (!storageAvailable) return defaultValue; try { return localStorage.getItem(key) || defaultValue; } catch(e) { return defaultValue; } }
         function setItem(key, value) { if (!storageAvailable) return false; try { localStorage.setItem(key, value); return true; } catch(e) { return false; } }
-        function removeItem(key) { if (!storageAvailable) return false; try { localStorage.removeItem(key); return true; } catch(e) { return false; } }
 
         function getEmbedUrl(provider, type, id, s = 1, e = 1) {
             const providers = {
@@ -316,6 +502,7 @@
                 twoembed: type === 'movie' ? `https://www.2embed.cc/embed/${id}` : `https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}`,
                 embedsu: type === 'movie' ? `https://embed.su/embed/movie/${id}` : `https://embed.su/embed/tv/${id}/${s}/${e}`,
                 superembed: type === 'movie' ? `https://multiembed.mov/?video_id=${id}&tmdb=1` : `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}`,
+                smashy: type === 'movie' ? `https://embed.smashystream.com/playere.php?tmdb=${id}` : `https://embed.smashystream.com/playere.php?tmdb=${id}&season=${s}&episode=${e}`,
             };
             return providers[provider] || providers.vidkingnet;
         }
@@ -323,7 +510,6 @@
         function downloadCurrentVideo() {
             if (currentVideoUrl && currentVideoUrl !== 'about:blank') {
                 try {
-                    // Create a temporary anchor element
                     const link = document.createElement('a');
                     link.href = currentVideoUrl;
                     link.download = `${activeTitle.replace(/[^a-z0-9]/gi, '_')}.mp4`;
@@ -333,7 +519,6 @@
                     document.body.removeChild(link);
                     showToast(`Download started for ${activeTitle}`);
                 } catch (error) {
-                    // If direct download fails, open in new tab
                     window.open(currentVideoUrl, '_blank');
                     showToast(`Opening video source in new tab for download`);
                 }
@@ -434,6 +619,7 @@
 
         function toggleAutoplay() { autoplayEnabled = document.getElementById('autoplay-toggle').checked; setItem('autoplay', autoplayEnabled); }
         function toggleAutoNext() { autoNextEnabled = document.getElementById('autonext-toggle').checked; setItem('autonext', autoNextEnabled); }
+        function setSmartMatchSetting() { smartMatchEnabled = document.getElementById('settings-smart-match').checked; setItem('smartMatch', smartMatchEnabled); }
         function setAutoplaySetting() { autoplayEnabled = document.getElementById('settings-autoplay').checked; document.getElementById('autoplay-toggle').checked = autoplayEnabled; setItem('autoplay', autoplayEnabled); }
         function setAutoNextSetting() { autoNextEnabled = document.getElementById('settings-autonext').checked; document.getElementById('autonext-toggle').checked = autoNextEnabled; setItem('autonext', autoNextEnabled); }
 
@@ -490,28 +676,29 @@
         document.addEventListener('DOMContentLoaded', () => {
             autoplayEnabled = getItem('autoplay') !== 'false';
             autoNextEnabled = getItem('autonext') !== 'false';
+            smartMatchEnabled = getItem('smartMatch') !== 'false';
             document.getElementById('autoplay-toggle').checked = autoplayEnabled;
             document.getElementById('autonext-toggle').checked = autoNextEnabled;
             document.getElementById('settings-autoplay').checked = autoplayEnabled;
             document.getElementById('settings-autonext').checked = autoNextEnabled;
+            document.getElementById('settings-smart-match').checked = smartMatchEnabled;
             initializePreferences();
             fetchTrending('movie', true);
             syncDashboardUI();
             updateBadges();
             
+            // SIMPLE SEARCH HANDLER - like before
             const handleSearch = async (e) => {
                 const query = e.target.value.trim();
                 currentSearchQuery = query;
                 if (query.length > 2) {
-                    const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
-                    const data = await res.json();
-                    const filtered = data.results.filter(i => i.media_type === 'movie' || i.media_type === 'tv');
-                    document.getElementById('section-title').innerText = `Search results for: "${query}"`;
-                    const detailed = await Promise.all(filtered.map(async item => {
-                        const detailRes = await fetch(`${BASE_URL}/${item.media_type}/${item.id}?api_key=${API_KEY}`);
-                        return { ...item, details: await detailRes.json() };
-                    }));
-                    renderDetailedGrid(detailed);
+                    const results = await simpleSearch(query);
+                    if (results.length > 0) {
+                        document.getElementById('section-title').innerText = `Search results for: "${query}"`;
+                        renderDetailedGrid(results);
+                    } else {
+                        document.getElementById('media-grid').innerHTML = '<div class="col-span-full text-center text-zinc-500 py-12 text-sm">No results found.</div>';
+                    }
                     document.getElementById('prev-page-btn').style.display = 'none';
                     document.getElementById('next-page-btn').style.display = 'none';
                     document.getElementById('page-indicator').style.display = 'none';
@@ -547,6 +734,7 @@
             document.getElementById('provider-select').value = selected;
             setAutoplaySetting();
             setAutoNextSetting();
+            setSmartMatchSetting();
             toggleSettingsModal();
             showToast('Settings saved');
         }
@@ -563,35 +751,32 @@
             const data = await res.json();
             trendingTotalPages = Math.min(data.total_pages || 1, 500);
             setPageIndicator();
-            const detailed = await Promise.all(data.results.map(async item => {
-                const detailRes = await fetch(`${BASE_URL}/${type}/${item.id}?api_key=${API_KEY}`);
-                return { ...item, details: await detailRes.json() };
-            }));
-            renderDetailedGrid(detailed);
+            renderDetailedGrid(data.results);
         }
 
         function renderDetailedGrid(items) {
             const grid = document.getElementById('media-grid');
             grid.innerHTML = '';
             items.forEach(item => {
-                const details = item.details;
+                const type = item.media_type || activeType;
                 const title = item.title || item.name;
                 const year = (item.release_date || item.first_air_date || '').split('-')[0] || 'N/A';
                 const poster = item.poster_path ? `${IMAGE_URL}${item.poster_path}` : '';
-                const rating = details.vote_average ? details.vote_average.toFixed(1) : 'N/A';
-                const overview = details.overview ? details.overview.substring(0, 120) + '...' : 'No description available';
-                const genres = details.genres ? details.genres.slice(0, 2).map(g => g.name) : [];
+                const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
+                const overview = item.overview ? item.overview.substring(0, 120) + '...' : 'No description available';
+                const genres = item.genre_ids ? item.genre_ids.slice(0, 2) : [];
+                
                 const card = document.createElement('div');
                 card.className = "group cursor-pointer bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden hover:border-zinc-700 transition-all hover:shadow-xl";
-                card.onclick = () => showDetailModal(activeType, item.id, title);
-                card.innerHTML = `<div class="flex flex-col sm:flex-row"><div class="sm:w-40 relative overflow-hidden"><img src="${poster}" class="w-full h-full object-cover group-hover:scale-105 transition-transform"><div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center"><div class="bg-zinc-950/80 p-3 rounded-full"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg></div></div></div><div class="flex-1 p-4"><div class="flex justify-between"><h3 class="font-semibold text-zinc-100">${escapeHtml(title)}</h3><span class="text-xs text-zinc-500">${year}</span></div><div class="flex items-center gap-2 mt-1"><span class="text-xs text-yellow-500">Rating: ${rating}</span><span class="text-xs text-zinc-500">/10</span></div><div class="flex gap-1 mt-1">${genres.map(g => `<span class="text-[10px] px-2 py-0.5 rounded-full bg-zinc-900 border border-zinc-800">${escapeHtml(g)}</span>`).join('')}</div><p class="text-xs text-zinc-400 mt-2 line-clamp-2">${escapeHtml(overview)}</p></div></div>`;
+                card.onclick = () => showDetailModal(type, item.id, title);
+                card.innerHTML = `<div class="flex flex-col sm:flex-row"><div class="sm:w-40 relative overflow-hidden"><img src="${poster}" class="w-full h-full object-cover group-hover:scale-105 transition-transform"><div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center"><div class="bg-zinc-950/80 p-3 rounded-full"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg></div></div></div><div class="flex-1 p-4"><div class="flex justify-between"><h3 class="font-semibold text-zinc-100">${escapeHtml(title)}</h3><span class="text-xs text-zinc-500">${year}</span></div><div class="flex items-center gap-2 mt-1"><span class="text-xs text-yellow-500">Rating: ${rating}</span><span class="text-xs text-zinc-500">/10</span></div><p class="text-xs text-zinc-400 mt-2 line-clamp-2">${escapeHtml(overview)}</p></div></div>`;
                 grid.appendChild(card);
             });
         }
 
         async function showDetailModal(type, id, title) {
             currentMediaData = { id, type, title };
-            const res = await fetch(`${BASE_URL}/${type}/${id}?api_key=${API_KEY}&append_to_response=credits`);
+            const res = await fetch(`${BASE_URL}/${type}/${id}?api_key=${API_KEY}`);
             const data = await res.json();
             document.getElementById('modal-backdrop').style.backgroundImage = data.backdrop_path ? `linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(24,24,27,0.95)), url(${BACKDROP_URL}${data.backdrop_path})` : '';
             document.getElementById('modal-poster').src = data.poster_path ? `${IMAGE_URL}${data.poster_path}` : '';
